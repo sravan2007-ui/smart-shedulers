@@ -6,42 +6,91 @@
 <div class="row">
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1><i class="fas fa-book me-2"></i>Manage Subjects</h1>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSubjectModal">
-                <i class="fas fa-plus me-2"></i>Add Subject
-            </button>
+            <div>
+                <h1 class="animate-slide-in"><i class="fas fa-book me-2 text-primary"></i>Manage Subjects</h1>
+                <p class="text-muted mb-0">Configure subjects, scheduling preferences, and lab requirements</p>
+            </div>
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-primary" id="bulkImportBtn">
+                    <i class="fas fa-upload me-2"></i>Bulk Import
+                </button>
+                <button class="btn btn-primary generate-timetable-btn btn-click-effect" data-bs-toggle="modal" data-bs-target="#addSubjectModal">
+                    <i class="fas fa-plus btn-icon"></i>Add Subject
+                </button>
+            </div>
         </div>
     </div>
 </div>
 
 <div class="row">
     <div class="col-12">
-        <div class="card">
+        <div class="card action-card">
+            <div class="card-header bg-gradient-primary text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-list me-2"></i>Subject Database</h5>
+                    <div class="d-flex gap-2">
+                        <select class="form-select form-select-sm" id="departmentFilter" style="width: auto;">
+                            <option value="">All Departments</option>
+                            <option value="Computer Science">Computer Science</option>
+                            <option value="Electronics">Electronics</option>
+                            <option value="Mechanical">Mechanical</option>
+                            <option value="Civil">Civil</option>
+                            <option value="Mathematics">Mathematics</option>
+                            <option value="Physics">Physics</option>
+                            <option value="Chemistry">Chemistry</option>
+                        </select>
+                        <select class="form-select form-select-sm" id="semesterFilter" style="width: auto;">
+                            <option value="">All Semesters</option>
+                            <option value="1">Semester 1</option>
+                            <option value="2">Semester 2</option>
+                            <option value="3">Semester 3</option>
+                            <option value="4">Semester 4</option>
+                            <option value="5">Semester 5</option>
+                            <option value="6">Semester 6</option>
+                            <option value="7">Semester 7</option>
+                            <option value="8">Semester 8</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
             <div class="card-body">
-                <!-- Search Container -->
-                <div class="search-container">
+                <!-- Enhanced Search Container -->
+                <div class="search-container mb-3">
                     <input type="text" class="search-input" id="subjectSearch" placeholder="Search subjects by name, code, department, or semester...">
                     <i class="fas fa-search search-icon"></i>
+                    <div class="search-stats" id="searchStats"></div>
                 </div>
                 <div class="table-responsive">
-                    <table class="table table-striped" id="subjectsTable">
-                        <thead>
+                    <table class="table table-hover" id="subjectsTable">
+                        <thead class="table-dark">
                             <tr>
-                                <th>Name</th>
-                                <th>Code</th>
-                                <th>Department</th>
-                                <th>Semester</th>
-                                <th>Credits</th>
-                                <th>Hours/Week</th>
-                                <th>Scheduling</th>
-                                <th>Lab Required</th>
-                                <th>Actions</th>
+                                <th><i class="fas fa-book me-1"></i>Name</th>
+                                <th><i class="fas fa-code me-1"></i>Code</th>
+                                <th><i class="fas fa-building me-1"></i>Department</th>
+                                <th><i class="fas fa-calendar me-1"></i>Semester</th>
+                                <th><i class="fas fa-star me-1"></i>Credits</th>
+                                <th><i class="fas fa-clock me-1"></i>Hours/Week</th>
+                                <th><i class="fas fa-calendar-alt me-1"></i>Scheduling</th>
+                                <th><i class="fas fa-flask me-1"></i>Lab</th>
+                                <th><i class="fas fa-cog me-1"></i>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             <!-- Data will be loaded via JavaScript -->
                         </tbody>
                     </table>
+                </div>
+                
+                <!-- Empty State -->
+                <div id="emptyState" class="text-center py-5" style="display: none;">
+                    <div class="empty-state">
+                        <i class="fas fa-book fa-3x text-muted mb-3 empty-icon"></i>
+                        <h5 class="text-muted">No subjects found</h5>
+                        <p class="text-muted">Start by adding your first subject or adjust your search filters.</p>
+                        <button class="generate-timetable-btn btn-click-effect" data-bs-toggle="modal" data-bs-target="#addSubjectModal">
+                            <i class="fas fa-plus btn-icon"></i>Add First Subject
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -50,81 +99,159 @@
 
 <!-- Add Subject Modal -->
 <div class="modal fade" id="addSubjectModal" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Add New Subject</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="fas fa-plus me-2"></i>Add New Subject</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <form id="addSubjectForm">
-                    <div class="mb-3">
-                        <label for="name" class="form-label">Subject Name</label>
-                        <input type="text" class="form-control" id="name" name="name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="code" class="form-label">Subject Code</label>
-                        <input type="text" class="form-control" id="code" name="code" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="department" class="form-label">Department</label>
-                        <select class="form-select" id="department" name="department" required>
-                            <option value="">Select Department</option>
-                            <option value="Computer Science">Computer Science</option>
-                            <option value="Mathematics">Mathematics</option>
-                            <option value="Physics">Physics</option>
-                            <option value="Chemistry">Chemistry</option>
-                            <option value="Electronics">Electronics</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="semester" class="form-label">Semester</label>
-                        <select class="form-select" id="semester" name="semester" required>
-                            <option value="">Select Semester</option>
-                            <option value="1">1st Semester</option>
-                            <option value="2">2nd Semester</option>
-                            <option value="3">3rd Semester</option>
-                            <option value="4">4th Semester</option>
-                            <option value="5">5th Semester</option>
-                            <option value="6">6th Semester</option>
-                            <option value="7">7th Semester</option>
-                            <option value="8">8th Semester</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="credits" class="form-label">Credits</label>
-                        <input type="number" class="form-control" id="credits" name="credits" min="1" max="6" value="3" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="classes_per_week" class="form-label">Classes per Week</label>
-                        <input type="number" class="form-control" id="classes_per_week" name="classes_per_week" min="1" max="10" value="3" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="scheduling_preference" class="form-label">Scheduling Preference</label>
-                        <select class="form-select" id="scheduling_preference" name="scheduling_preference" required>
-                            <option value="single">Single Classes (45 min each)</option>
-                            <option value="continuous">Continuous Blocks (90 min blocks)</option>
-                            <option value="mixed">Mixed (Continuous + Single)</option>
-                        </select>
-                        <div class="form-text">
-                            <strong>Single:</strong> Each class is 45 minutes<br>
-                            <strong>Continuous:</strong> Classes are combined into 90-minute blocks<br>
-                            <strong>Mixed:</strong> Combination of both (e.g., 4 classes = 2+2, 3 classes = 2+1)
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label for="name" class="form-label"><i class="fas fa-book me-1"></i>Subject Name</label>
+                                <input type="text" class="form-control" id="name" name="name" placeholder="e.g., Data Structures and Algorithms" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="code" class="form-label"><i class="fas fa-code me-1"></i>Subject Code</label>
+                                <input type="text" class="form-control" id="code" name="code" placeholder="e.g., CS301" required>
+                            </div>
                         </div>
                     </div>
-                    <div class="mb-3" id="continuous_block_size_container" style="display: none;">
-                        <label for="continuous_block_size" class="form-label">Continuous Block Size</label>
-                        <select class="form-select" id="continuous_block_size" name="continuous_block_size">
-                            <option value="2">2 Classes (90 minutes)</option>
-                            <option value="3">3 Classes (135 minutes)</option>
-                        </select>
-                        <div class="form-text">Number of 45-minute classes to combine into one block</div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="department" class="form-label"><i class="fas fa-building me-1"></i>Department</label>
+                                <select class="form-select" id="department" name="department" required>
+                                    <option value="">Select Department</option>
+                                    <option value="Computer Science">Computer Science & Engineering</option>
+                                    <option value="Electronics">Electronics & Communication</option>
+                                    <option value="Electrical">Electrical & Electronics</option>
+                                    <option value="Mechanical">Mechanical Engineering</option>
+                                    <option value="Civil">Civil Engineering</option>
+                                    <option value="Chemical">Chemical Engineering</option>
+                                    <option value="Mathematics">Mathematics</option>
+                                    <option value="Physics">Physics</option>
+                                    <option value="Chemistry">Chemistry</option>
+                                    <option value="English">English</option>
+                                    <option value="Management">Management Studies</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="semester" class="form-label"><i class="fas fa-calendar me-1"></i>Semester</label>
+                                <select class="form-select" id="semester" name="semester" required>
+                                    <option value="">Select Semester</option>
+                                    <option value="1">1st Semester</option>
+                                    <option value="2">2nd Semester</option>
+                                    <option value="3">3rd Semester</option>
+                                    <option value="4">4th Semester</option>
+                                    <option value="5">5th Semester</option>
+                                    <option value="6">6th Semester</option>
+                                    <option value="7">7th Semester</option>
+                                    <option value="8">8th Semester</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="requires_lab" name="requires_lab">
-                        <label class="form-check-label" for="requires_lab">
-                            Requires Laboratory
-                        </label>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="credits" class="form-label"><i class="fas fa-star me-1"></i>Credits</label>
+                                <input type="number" class="form-control" id="credits" name="credits" min="1" max="6" value="3" required>
+                                <div class="form-text">Academic credits for this subject</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="hours_per_week" class="form-label"><i class="fas fa-clock me-1"></i>Hours per Week</label>
+                                <input type="number" class="form-control" id="hours_per_week" name="hours_per_week" min="1" max="10" value="3" required>
+                                <div class="form-text">Total teaching hours per week</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="subject_type" class="form-label"><i class="fas fa-tag me-1"></i>Subject Type</label>
+                                <select class="form-select" id="subject_type" name="subject_type">
+                                    <option value="theory">Theory</option>
+                                    <option value="practical">Practical/Lab</option>
+                                    <option value="theory_practical">Theory + Practical</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Advanced Scheduling Options -->
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h6 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Scheduling Preferences</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="scheduling_preference" class="form-label">Class Duration Preference</label>
+                                        <select class="form-select" id="scheduling_preference" name="scheduling_preference" required>
+                                            <option value="single">Single Classes (50 min each)</option>
+                                            <option value="continuous">Continuous Blocks (100 min blocks)</option>
+                                            <option value="mixed">Mixed (Continuous + Single)</option>
+                                        </select>
+                                        <div class="form-text">
+                                            <strong>Single:</strong> Each class is 50 minutes<br>
+                                            <strong>Continuous:</strong> Classes are combined into 100-minute blocks<br>
+                                            <strong>Mixed:</strong> Combination of both approaches
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3" id="continuous_block_size_container" style="display: none;">
+                                        <label for="continuous_block_size" class="form-label">Continuous Block Size</label>
+                                        <select class="form-select" id="continuous_block_size" name="continuous_block_size">
+                                            <option value="2">2 Classes (100 minutes)</option>
+                                            <option value="3">3 Classes (150 minutes)</option>
+                                        </select>
+                                        <div class="form-text">Number of 50-minute classes to combine into one block</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-check mb-2">
+                                        <input type="checkbox" class="form-check-input" id="requires_lab" name="requires_lab">
+                                        <label class="form-check-label" for="requires_lab">
+                                            <i class="fas fa-flask me-1"></i>Requires Laboratory
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input type="checkbox" class="form-check-input" id="requires_projector" name="requires_projector">
+                                        <label class="form-check-label" for="requires_projector">
+                                            <i class="fas fa-video me-1"></i>Requires Projector
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check mb-2">
+                                        <input type="checkbox" class="form-check-input" id="avoid_first_period" name="avoid_first_period">
+                                        <label class="form-check-label" for="avoid_first_period">
+                                            <i class="fas fa-clock me-1"></i>Avoid First Period
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input type="checkbox" class="form-check-input" id="avoid_last_period" name="avoid_last_period">
+                                        <label class="form-check-label" for="avoid_last_period">
+                                            <i class="fas fa-clock me-1"></i>Avoid Last Period
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>

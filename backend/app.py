@@ -1,8 +1,9 @@
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for, flash, make_response
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
-from models import db, User, Subject, Faculty, Classroom, Batch, Timetable, TimetableEntry, FacultySubject
+from models import db, User, Subject, Faculty, Classroom, Batch, Timetable, TimetableEntry, FacultySubject, ClassroomAllocation
 from timetable_optimizer import TimetableOptimizer
+from classroom_allocator import SmartClassroomAllocator, extract_branch_section_from_name, generate_batch_name
 import json
 from functools import wraps
 from reportlab.lib import colors
@@ -103,6 +104,78 @@ def login():
     
     return render_template('login.html')
 
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        # Check if it's an AJAX request
+        is_ajax = request.headers.get('Content-Type') == 'application/json'
+        
+        if is_ajax:
+            data = request.get_json()
+            username = data.get('username')
+            password = data.get('password')
+            email = data.get('email')
+            role = data.get('role', 'user')
+        else:
+            username = request.form['username']
+            password = request.form['password']
+            email = request.form['email']
+            role = request.form.get('role', 'user')
+        
+        # Check if user already exists
+        existing_user = User.query.filter_by(username=username).first()
+        if existing_user:
+            if is_ajax:
+                return jsonify({
+                    'success': False,
+                    'message': 'Username already exists. Please choose a different username.'
+                }), 400
+            else:
+                flash('Username already exists. Please choose a different username.', 'error')
+                return render_template('register.html')
+        
+        # Check if email already exists
+        existing_email = User.query.filter_by(email=email).first()
+        if existing_email:
+            if is_ajax:
+                return jsonify({
+                    'success': False,
+                    'message': 'Email already registered. Please use a different email.'
+                }), 400
+            else:
+                flash('Email already registered. Please use a different email.', 'error')
+                return render_template('register.html')
+        
+        # Create new user
+        try:
+            new_user = User(username=username, email=email, role=role)
+            new_user.set_password(password)
+            db.session.add(new_user)
+            db.session.commit()
+            
+            if is_ajax:
+                return jsonify({
+                    'success': True,
+                    'message': 'Account created successfully! You can now login.',
+                    'redirect_url': url_for('login')
+                })
+            else:
+                flash('Account created successfully! You can now login.', 'success')
+                return redirect(url_for('login'))
+                
+        except Exception as e:
+            db.session.rollback()
+            if is_ajax:
+                return jsonify({
+                    'success': False,
+                    'message': 'Registration failed. Please try again.'
+                }), 500
+            else:
+                flash('Registration failed. Please try again.', 'error')
+                return render_template('register.html')
+    
+    return render_template('register.html')
+
 @app.route('/logout')
 def logout():
     session.clear()
@@ -197,7 +270,11 @@ def api_classrooms():
                 name=data['name'],
                 capacity=data['capacity'],
                 type=data.get('type', 'regular'),
-                equipment=data.get('equipment', '')
+                equipment=data.get('equipment', ''),
+                is_fixed_allocation=data.get('is_fixed_allocation', False),
+                fixed_batch_id=data.get('fixed_batch_id', None),
+                priority_level=data.get('priority_level', 1),
+                can_be_shared=data.get('can_be_shared', True)
             )
             db.session.add(classroom)
             db.session.commit()
@@ -216,6 +293,11 @@ def api_classrooms():
             'capacity': c.capacity,
             'type': c.type,
             'equipment': c.equipment,
+            'is_fixed_allocation': c.is_fixed_allocation,
+            'fixed_batch_id': c.fixed_batch_id,
+            'fixed_batch_name': c.fixed_batch.name if c.fixed_batch else None,
+            'priority_level': c.priority_level,
+            'can_be_shared': c.can_be_shared,
             'created_at': c.created_at.isoformat() if c.created_at else None
         } for c in classrooms]
     })
@@ -235,6 +317,10 @@ def api_classroom_detail(classroom_id):
             classroom.capacity = data.get('capacity', classroom.capacity)
             classroom.type = data.get('type', classroom.type)
             classroom.equipment = data.get('equipment', classroom.equipment)
+            classroom.is_fixed_allocation = data.get('is_fixed_allocation', classroom.is_fixed_allocation)
+            classroom.fixed_batch_id = data.get('fixed_batch_id', classroom.fixed_batch_id)
+            classroom.priority_level = data.get('priority_level', classroom.priority_level)
+            classroom.can_be_shared = data.get('can_be_shared', classroom.can_be_shared)
             
             db.session.commit()
             return jsonify({'success': True, 'message': 'Classroom updated successfully'})
@@ -250,6 +336,280 @@ def api_classroom_detail(classroom_id):
         except Exception as e:
             db.session.rollback()
             return jsonify({'success': False, 'error': str(e)}), 500
+
+# API Routes for Classroom Allocation Management
+@app.route('/api/classroom-allocations', methods=['GET'])
+@login_required
+def api_classroom_allocations():
+    """Get classroom allocation status and utilization report"""
+    try:
+        allocator = SmartClassroomAllocator()
+        utilization_report = allocator.get_classroom_utilization_report()
+        
+        return jsonify({
+            'success': True,
+            'utilization_report': [{
+                'classroom_id': report['classroom'].id,
+                'classroom_name': report['classroom'].name,
+                'classroom_type': report['classroom'].type,
+                'is_fixed_allocation': report['classroom'].is_fixed_allocation,
+                'fixed_batch_name': report['classroom'].fixed_batch.name if report['classroom'].fixed_batch else None,
+                'total_slots_used': report['total_slots_used'],
+                'temporary_allocations': report['temporary_allocations'],
+                'fixed_allocations': report['fixed_allocations'],
+                'utilization_percentage': report['utilization_percentage'],
+                'sharing_efficiency': report['sharing_efficiency']
+            } for report in utilization_report]
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/classroom-allocations/optimize', methods=['POST'])
+@login_required
+def api_optimize_classroom_allocations():
+    """Get optimization suggestions for classroom allocations"""
+    try:
+        allocator = SmartClassroomAllocator()
+        suggestions = allocator.optimize_classroom_assignments()
+        
+        return jsonify({
+            'success': True,
+            'suggestions': [{
+                'timetable_entry_id': suggestion['entry'].id,
+                'batch_name': suggestion['entry'].batch.name,
+                'subject_name': suggestion['entry'].subject.name,
+                'current_classroom': suggestion['current_classroom'].name,
+                'suggested_classroom': suggestion['suggested_classroom'].name,
+                'improvement_score': suggestion['improvement_score'],
+                'reason': suggestion['reason'],
+                'day_of_week': suggestion['entry'].day_of_week,
+                'time_slot': suggestion['entry'].time_slot
+            } for suggestion in suggestions]
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/classroom-availability', methods=['POST'])
+@login_required
+def api_check_classroom_availability():
+    """Check classroom availability for specific time slot"""
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'error': 'No JSON data received'})
+        
+        batch_id = data.get('batch_id')
+        day_of_week = data.get('day_of_week')
+        time_slot = data.get('time_slot')
+        subject_id = data.get('subject_id')
+        
+        if not all([batch_id, day_of_week is not None, time_slot]):
+            return jsonify({'success': False, 'error': 'Missing required parameters'})
+        
+        allocator = SmartClassroomAllocator()
+        available_classrooms = allocator.find_available_classrooms(
+            batch_id, day_of_week, time_slot, subject_id
+        )
+        
+        return jsonify({
+            'success': True,
+            'available_classrooms': [{
+                'classroom_id': info['classroom'].id,
+                'classroom_name': info['classroom'].name,
+                'classroom_type': info['classroom'].type,
+                'capacity': info['classroom'].capacity,
+                'priority_score': info['priority_score'],
+                'allocation_type': info['allocation_type'],
+                'can_borrow': info.get('can_borrow', False),
+                'is_temporary': info['allocation_type'] == 'temporary_borrow',
+                'original_owner_name': Batch.query.get(info['original_owner']).name if info.get('original_owner') else None
+            } for info in available_classrooms]
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/branches', methods=['GET'])
+@login_required
+def api_branches():
+    """Get all unique branches"""
+    try:
+        branches = db.session.query(Batch.branch).distinct().all()
+        return jsonify({
+            'success': True,
+            'branches': [branch[0] for branch in branches if branch[0]]
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/sections/<branch>', methods=['GET'])
+@login_required
+def api_sections_by_branch(branch):
+    """Get all sections for a specific branch"""
+    try:
+        sections = db.session.query(Batch.section).filter_by(branch=branch).distinct().all()
+        return jsonify({
+            'success': True,
+            'sections': [section[0] for section in sections if section[0]]
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+# API Routes for Faculty-Subject Assignments
+@app.route('/api/faculty-subjects', methods=['GET', 'POST'])
+@login_required
+def api_faculty_subjects():
+    """Manage faculty-subject assignments"""
+    if request.method == 'POST':
+        try:
+            data = request.get_json()
+            if not data:
+                return jsonify({'success': False, 'error': 'No JSON data received'})
+            
+            # Check if assignment already exists
+            existing = FacultySubject.query.filter_by(
+                faculty_id=data['faculty_id'],
+                subject_id=data['subject_id'],
+                department=data.get('department'),
+                branch=data.get('branch'),
+                semester=data.get('semester')
+            ).first()
+            
+            if existing:
+                return jsonify({
+                    'success': False, 
+                    'error': 'This faculty-subject assignment already exists for the specified criteria'
+                }), 400
+            
+            assignment = FacultySubject(
+                faculty_id=data['faculty_id'],
+                subject_id=data['subject_id'],
+                department=data.get('department'),
+                branch=data.get('branch'),
+                semester=data.get('semester'),
+                is_primary=data.get('is_primary', True),
+                priority=data.get('priority', 1)
+            )
+            db.session.add(assignment)
+            db.session.commit()
+            
+            return jsonify({'success': True, 'message': 'Faculty-subject assignment created successfully'})
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'success': False, 'error': str(e)}), 500
+    
+    # GET request - return all assignments with details
+    try:
+        assignments = db.session.query(FacultySubject).join(Faculty).join(Subject).all()
+        return jsonify({
+            'success': True,
+            'assignments': [{
+                'id': fs.id,
+                'faculty_id': fs.faculty_id,
+                'faculty_name': fs.faculty.name,
+                'faculty_department': fs.faculty.department,
+                'subject_id': fs.subject_id,
+                'subject_name': fs.subject.name,
+                'subject_department': fs.subject.department,
+                'department': fs.department,
+                'branch': fs.branch,
+                'semester': fs.semester,
+                'is_primary': fs.is_primary,
+                'priority': fs.priority,
+                'created_at': fs.created_at.isoformat() if fs.created_at else None
+            } for fs in assignments]
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/faculty-subjects/<int:assignment_id>', methods=['PUT', 'DELETE'])
+@login_required
+def api_faculty_subject_detail(assignment_id):
+    """Update or delete faculty-subject assignment"""
+    assignment = FacultySubject.query.get_or_404(assignment_id)
+    
+    if request.method == 'PUT':
+        try:
+            data = request.get_json()
+            if not data:
+                return jsonify({'success': False, 'error': 'No JSON data received'})
+            
+            assignment.department = data.get('department', assignment.department)
+            assignment.branch = data.get('branch', assignment.branch)
+            assignment.semester = data.get('semester', assignment.semester)
+            assignment.is_primary = data.get('is_primary', assignment.is_primary)
+            assignment.priority = data.get('priority', assignment.priority)
+            
+            db.session.commit()
+            return jsonify({'success': True, 'message': 'Faculty-subject assignment updated successfully'})
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'success': False, 'error': str(e)}), 500
+    
+    elif request.method == 'DELETE':
+        try:
+            db.session.delete(assignment)
+            db.session.commit()
+            return jsonify({'success': True, 'message': 'Faculty-subject assignment deleted successfully'})
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/faculty-subjects/bulk-assign', methods=['POST'])
+@login_required
+def api_bulk_assign_faculty_subjects():
+    """Bulk assign faculty to subjects based on department matching"""
+    try:
+        data = request.get_json()
+        department = data.get('department')
+        branch = data.get('branch')
+        semester = data.get('semester')
+        
+        if not department:
+            return jsonify({'success': False, 'error': 'Department is required'}), 400
+        
+        # Get all subjects for the department
+        subjects = Subject.query.filter_by(department=department).all()
+        
+        # Get all faculty for the department
+        faculty_members = Faculty.query.filter_by(department=department).all()
+        
+        assignments_created = 0
+        
+        for subject in subjects:
+            for faculty in faculty_members:
+                # Check if assignment already exists
+                existing = FacultySubject.query.filter_by(
+                    faculty_id=faculty.id,
+                    subject_id=subject.id,
+                    department=department,
+                    branch=branch,
+                    semester=semester
+                ).first()
+                
+                if not existing:
+                    assignment = FacultySubject(
+                        faculty_id=faculty.id,
+                        subject_id=subject.id,
+                        department=department,
+                        branch=branch,
+                        semester=semester,
+                        is_primary=True,
+                        priority=1
+                    )
+                    db.session.add(assignment)
+                    assignments_created += 1
+        
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': f'Created {assignments_created} faculty-subject assignments',
+            'assignments_created': assignments_created
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 # API Routes for Subjects
 @app.route('/api/subjects', methods=['GET', 'POST'])
@@ -416,11 +776,24 @@ def api_batches():
             if not data:
                 return jsonify({'success': False, 'error': 'No JSON data received'})
             
+            # Extract branch and section from name if not provided
+            name = data['name']
+            branch = data.get('branch')
+            section = data.get('section')
+            
+            if not branch or not section:
+                extracted_branch, extracted_section = extract_branch_section_from_name(name)
+                branch = branch or extracted_branch
+                section = section or extracted_section
+            
             batch = Batch(
-                name=data['name'],
+                name=name,
                 department=data['department'],
+                branch=branch,
+                section=section,
                 semester=data['semester'],
-                student_count=data['student_count']
+                student_count=data['student_count'],
+                priority_for_allocation=data.get('priority_for_allocation', 2)
                 # shift will be automatically assigned during timetable generation
             )
             db.session.add(batch)
@@ -438,8 +811,11 @@ def api_batches():
             'id': b.id,
             'name': b.name,
             'department': b.department,
+            'branch': b.branch,
+            'section': b.section,
             'semester': b.semester,
             'student_count': b.student_count,
+            'priority_for_allocation': b.priority_for_allocation,
             'created_at': b.created_at.isoformat() if b.created_at else None
         } for b in batches]
     })
@@ -457,8 +833,11 @@ def api_batch_detail(batch_id):
             
             batch.name = data.get('name', batch.name)
             batch.department = data.get('department', batch.department)
+            batch.branch = data.get('branch', batch.branch)
+            batch.section = data.get('section', batch.section)
             batch.semester = data.get('semester', batch.semester)
             batch.student_count = data.get('student_count', batch.student_count)
+            batch.priority_for_allocation = data.get('priority_for_allocation', batch.priority_for_allocation)
             # shift is no longer user-configurable
             
             db.session.commit()
@@ -475,6 +854,53 @@ def api_batch_detail(batch_id):
         except Exception as e:
             db.session.rollback()
             return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/batches/<int:batch_id>/details', methods=['GET'])
+@login_required
+def api_batch_details(batch_id):
+    """Get detailed information about a specific batch including academic year"""
+    try:
+        batch = Batch.query.get(batch_id)
+        if not batch:
+            return jsonify({'success': False, 'error': 'Batch not found'}), 404
+        
+        return jsonify({
+            'success': True,
+            'batch': {
+                'id': batch.id,
+                'name': batch.name,
+                'department': batch.department,
+                'branch': batch.branch,
+                'section': batch.section,
+                'semester': batch.semester,
+                'academic_year': batch.academic_year,
+                'student_count': batch.student_count,
+                'shift': batch.shift,
+                'priority_for_allocation': batch.priority_for_allocation,
+                'created_at': batch.created_at.isoformat() if batch.created_at else None
+            }
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/academic-years', methods=['GET'])
+@login_required
+def api_academic_years():
+    """Get all available academic years from batches"""
+    try:
+        # Get distinct academic years from batches
+        academic_years = db.session.query(Batch.academic_year).distinct().filter(
+            Batch.academic_year.isnot(None)
+        ).order_by(Batch.academic_year.desc()).all()
+        
+        years = [year[0] for year in academic_years if year[0]]
+        
+        return jsonify({
+            'success': True,
+            'academic_years': years
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 # API Routes for Timetables
 @app.route('/api/timetables', methods=['GET'])
@@ -618,6 +1044,7 @@ def api_timetable_detail(timetable_id):
 
 # Timetable generation and saving
 @app.route('/api/generate-timetable', methods=['POST'])
+@login_required
 def generate_timetable():
     try:
         data = request.get_json()
@@ -635,9 +1062,33 @@ def generate_timetable():
         print(f"Received timing parameters: start={college_start_time}, end={college_end_time}, lunch_duration={lunch_break_duration}, lunch_start={lunch_break_start_time}")
         
         if not all([batch_id, semester, academic_year]):
+            missing = []
+            if not batch_id: missing.append('batch')
+            if not semester: missing.append('semester')
+            if not academic_year: missing.append('academic year')
             return jsonify({
                 'success': False,
-                'message': 'Missing required parameters'
+                'message': f'Missing required parameters: {", ".join(missing)}'
+            }), 400
+        
+        # Validate batch exists
+        batch = Batch.query.get(batch_id)
+        if not batch:
+            return jsonify({
+                'success': False,
+                'message': f'Batch with ID {batch_id} not found'
+            }), 400
+        
+        # Check if subjects exist for this semester and department
+        subjects_count = Subject.query.filter_by(
+            department=batch.department,
+            semester=int(semester)
+        ).count()
+        
+        if subjects_count == 0:
+            return jsonify({
+                'success': False,
+                'message': f'No subjects found for {batch.department} department, semester {semester}. Please add subjects first.'
             }), 400
         
         # Initialize optimizer with all timing configurations

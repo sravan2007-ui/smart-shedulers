@@ -27,7 +27,9 @@
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label for="semester" class="form-label">Semester</label>
+                        <label for="semester" class="form-label">
+                            <i class="fas fa-graduation-cap me-1"></i>Semester
+                        </label>
                         <select class="form-select" id="semester" name="semester" required>
                             <option value="">Select Semester</option>
                             <option value="1">1st Semester</option>
@@ -39,11 +41,22 @@
                             <option value="7">7th Semester</option>
                             <option value="8">8th Semester</option>
                         </select>
+                        <div class="form-text">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Will be automatically filled when you select a batch
+                        </div>
                     </div>
                     <div class="mb-3">
-                        <label for="academic_year" class="form-label">Academic Year</label>
-                        <input type="text" class="form-control" id="academic_year" name="academic_year" 
-                               placeholder="e.g., 2023-24" required>
+                        <label for="academic_year" class="form-label">
+                            <i class="fas fa-calendar-alt me-1"></i>Academic Year
+                        </label>
+                        <select class="form-select" id="academic_year" name="academic_year" required>
+                            <option value="">Select Academic Year</option>
+                        </select>
+                        <div class="form-text">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Will be automatically selected when you choose a batch
+                        </div>
                     </div>
                     <div class="mb-3">
                         <label for="college_name" class="form-label">College Name</label>
@@ -61,15 +74,18 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-6">
-                                    <label class="form-label">Start Time:</label>
+                                    <label class="form-label"><i class="fas fa-play me-1"></i>Start Time:</label>
                                     <select class="form-select" id="college_start_time">
                                         <option value="08:00">8:00 AM</option>
                                         <option value="08:30">8:30 AM</option>
                                         <option value="09:00" selected>9:00 AM</option>
+                                        <option value="09:30">9:30 AM</option>
+                                        <option value="10:00">10:00 AM</option>
                                     </select>
+                                    <div class="form-text">College day start time</div>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">End Time:</label>
+                                    <label class="form-label"><i class="fas fa-stop me-1"></i>End Time:</label>
                                     <select class="form-select" id="college_end_time">
                                         <option value="15:00">3:00 PM</option>
                                         <option value="15:30">3:30 PM</option>
@@ -77,7 +93,9 @@
                                         <option value="16:30" selected>4:30 PM</option>
                                         <option value="17:00">5:00 PM</option>
                                         <option value="17:30">5:30 PM</option>
+                                        <option value="18:00">6:00 PM</option>
                                     </select>
+                                    <div class="form-text">College day end time</div>
                                 </div>
                             </div>
                         </div>
@@ -238,6 +256,13 @@ let selectedOption = null;
 
 $(document).ready(function() {
     loadBatches();
+    loadAcademicYears();
+    
+    // Add event listener for batch selection change
+    $('#batch_id').on('change', function() {
+        const batchId = $(this).val();
+        loadBatchDetails(batchId);
+    });
     
     // Toggle short break options visibility
     $('#include_short_break').change(function() {
@@ -256,14 +281,74 @@ function loadBatches() {
         
         if (data && data.success && data.batches && Array.isArray(data.batches)) {
             data.batches.forEach(function(batch) {
-                select.append(`<option value="${batch.id}">${batch.name} - ${batch.department} (Sem ${batch.semester})</option>`);
+                const option = `<option value="${batch.id}">${batch.name} - ${batch.department} (Sem ${batch.semester})</option>`;
+                select.append(option);
             });
         } else {
-            console.log('No batches found or invalid response format:', data);
+            console.error('Invalid batches data:', data);
         }
     }).fail(function(xhr, status, error) {
-        console.error('Error loading batches:', xhr.responseText);
-        showAlert('Error loading batches: ' + error, 'danger');
+        console.error('Error loading batches:', error);
+        alert('Error loading batches. Please refresh the page.');
+    });
+}
+
+function loadAcademicYears() {
+    $.get('/api/academic-years', function(data) {
+        const select = $('#academic_year');
+        select.empty().append('<option value="">Select Academic Year</option>');
+        
+        if (data && data.success && data.academic_years && Array.isArray(data.academic_years)) {
+            data.academic_years.forEach(function(year) {
+                const option = `<option value="${year}">${year}</option>`;
+                select.append(option);
+            });
+        } else {
+            console.error('Invalid academic years data:', data);
+        }
+    }).fail(function(xhr, status, error) {
+        console.error('Error loading academic years:', error);
+    });
+}
+
+function loadBatchDetails(batchId) {
+    if (!batchId) {
+        // Clear academic year if no batch selected
+        $('#academic_year').val('');
+        $('#semester').val('');
+        return;
+    }
+    
+    $.get(`/api/batches/${batchId}/details`, function(data) {
+        if (data && data.success && data.batch) {
+            const batch = data.batch;
+            
+            // Auto-populate academic year
+            if (batch.academic_year) {
+                $('#academic_year').val(batch.academic_year);
+            }
+            
+            // Auto-populate semester
+            if (batch.semester) {
+                $('#semester').val(batch.semester);
+            }
+            
+            // Add visual feedback for both fields
+            const academicYearField = $('#academic_year');
+            const semesterField = $('#semester');
+            
+            academicYearField.addClass('auto-populated');
+            semesterField.addClass('auto-populated');
+            
+            setTimeout(() => {
+                academicYearField.removeClass('auto-populated');
+                semesterField.removeClass('auto-populated');
+            }, 2000);
+            
+            console.log(`Auto-populated: Academic Year: ${batch.academic_year}, Semester: ${batch.semester}`);
+        }
+    }).fail(function(xhr, status, error) {
+        console.error('Error loading batch details:', error);
     });
 }
 
@@ -786,25 +871,72 @@ function minutesToTime(totalMinutes) {
         margin-bottom: 5px;
     }
     
-    .subject-info strong {
-        color: #212529;
-        font-size: 0.9rem;
-    }
-    
     .subject-info small {
-        font-size: 0.75rem;
-    }
-    
-    .faculty-info, .classroom-info {
+        color: #6c757d;
         font-size: 0.8rem;
-        margin-bottom: 2px;
     }
     
-    .fixed-indicator {
+    .time-slot {
+        font-weight: bold;
+        color: #495057;
+        font-size: 0.85rem;
+    }
+    
+    .btn-option {
+        margin: 5px;
+        min-width: 120px;
+    }
+    
+    .loading-spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #007bff;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 20px auto;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    /* Auto-populated field animation */
+    .auto-populated {
+        background: linear-gradient(45deg, #e3f2fd, #bbdefb);
+        border-color: #2196f3;
+        box-shadow: 0 0 10px rgba(33, 150, 243, 0.3);
+        transition: all 0.5s ease;
+    }
+    
+    .auto-populated::after {
+        content: "✓ Auto-filled";
         position: absolute;
-        top: 2px;
-        right: 2px;
-        font-size: 0.7rem;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #2196f3;
+        font-size: 0.8rem;
+        font-weight: bold;
+        animation: fadeInOut 2s ease;
+    }
+    
+    @keyframes fadeInOut {
+        0% { opacity: 0; transform: translateY(-50%) translateX(10px); }
+        50% { opacity: 1; transform: translateY(-50%) translateX(0); }
+        100% { opacity: 0; transform: translateY(-50%) translateX(-10px); }
+    }
+    
+    /* Enhanced form styling */
+    .form-control, .form-select {
+        position: relative;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
     }
     
     .break-row {

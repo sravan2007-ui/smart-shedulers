@@ -1,4 +1,5 @@
 from models import db, Subject, Faculty, Classroom, Batch, FacultySubject
+from classroom_allocator import SmartClassroomAllocator
 import random
 from datetime import datetime, timedelta
 from collections import defaultdict
@@ -31,6 +32,9 @@ class TimetableOptimizer:
         self.max_classes_per_day = 6
         self.include_short_break = include_short_break
         self.short_break_duration = short_break_duration
+        
+        # Initialize smart classroom allocator
+        self.classroom_allocator = SmartClassroomAllocator()
         
     
     def calculate_subject_blocks(self, subject):
@@ -121,29 +125,39 @@ class TimetableOptimizer:
             print(f"Error getting batch subjects: {e}")
             return []
     
-    def get_available_faculty(self, subject_id):
-        """Get faculty members who can teach a specific subject, prioritizing by department match"""
+    def get_available_faculty(self, subject_id, batch_id=None):
+        """Get faculty members who can teach a specific subject, prioritizing by exact match"""
         try:
-            # Get the subject to find its department
-            from models import Subject
+            # Get the subject and batch information
             subject = Subject.query.get(subject_id)
             if not subject:
                 print(f"Subject with id {subject_id} not found")
                 return []
             
+            batch = None
+            if batch_id:
+                batch = Batch.query.get(batch_id)
+            
             subject_department = subject.department
-            print(f"Looking for faculty for subject {subject.name} in department {subject_department}")
+            print(f"Looking for faculty for subject: {subject.name} in department: {subject_department}")
+            if batch:
+                print(f"For batch: {batch.name} (Branch: {batch.branch}, Semester: {batch.semester})")
             
             faculty_list = []
             
-            # First try to get faculty from faculty_subjects mapping
-            faculty_subjects = FacultySubject.query.filter_by(subject_id=subject_id).all()
-            
-            if faculty_subjects:
-                print(f"Found {len(faculty_subjects)} faculty-subject mappings")
-                for fs in faculty_subjects:
-                    faculty = Faculty.query.get(fs.faculty_id)
-                    if faculty:
+            # Priority 1: Get faculty specifically assigned to this subject for this batch/department/branch
+            if batch:
+                specific_assignments = FacultySubject.query.filter_by(
+                    subject_id=subject_id,
+                    department=batch.department,
+                    branch=batch.branch,
+                    semester=batch.semester
+                ).order_by(FacultySubject.priority.asc(), FacultySubject.is_primary.desc()).all()
+                
+                if specific_assignments:
+                    print(f"Found {len(specific_assignments)} specific faculty assignments for this batch")
+                    for fs in specific_assignments:
+                        faculty = fs.faculty
                         faculty_list.append({
                             'id': faculty.id,
                             'name': faculty.name,
@@ -151,10 +165,60 @@ class TimetableOptimizer:
                             'department': faculty.department,
                             'specialization': getattr(faculty, 'specialization', ''),
                             'max_hours_per_week': faculty.max_hours_per_week,
-                            'max_hours_per_day': faculty.max_hours_per_day
+                            'max_hours_per_day': faculty.max_hours_per_day,
+                            'is_primary': fs.is_primary,
+                            'priority': fs.priority,
+                            'match_type': 'exact_match'
                         })
             
-            # If no specific mapping found, get faculty from same department
+            # Priority 2: Get faculty assigned to this subject for the same department
+            if not faculty_list:
+                dept_assignments = FacultySubject.query.filter_by(
+                    subject_id=subject_id,
+                    department=subject_department
+                ).order_by(FacultySubject.priority.asc(), FacultySubject.is_primary.desc()).all()
+                
+                if dept_assignments:
+                    print(f"Found {len(dept_assignments)} department-specific faculty assignments")
+                    for fs in dept_assignments:
+                        faculty = fs.faculty
+                        faculty_list.append({
+                            'id': faculty.id,
+                            'name': faculty.name,
+                            'email': faculty.email,
+                            'department': faculty.department,
+                            'specialization': getattr(faculty, 'specialization', ''),
+                            'max_hours_per_week': faculty.max_hours_per_week,
+                            'max_hours_per_day': faculty.max_hours_per_day,
+                            'is_primary': fs.is_primary,
+                            'priority': fs.priority,
+                            'match_type': 'department_match'
+                        })
+            
+            # Priority 3: Get any faculty assigned to this subject
+            if not faculty_list:
+                general_assignments = FacultySubject.query.filter_by(
+                    subject_id=subject_id
+                ).order_by(FacultySubject.priority.asc(), FacultySubject.is_primary.desc()).all()
+                
+                if general_assignments:
+                    print(f"Found {len(general_assignments)} general faculty assignments")
+                    for fs in general_assignments:
+                        faculty = fs.faculty
+                        faculty_list.append({
+                            'id': faculty.id,
+                            'name': faculty.name,
+                            'email': faculty.email,
+                            'department': faculty.department,
+                            'specialization': getattr(faculty, 'specialization', ''),
+                            'max_hours_per_week': faculty.max_hours_per_week,
+                            'max_hours_per_day': faculty.max_hours_per_day,
+                            'is_primary': fs.is_primary,
+                            'priority': fs.priority,
+                            'match_type': 'subject_match'
+                        })
+            
+            # Priority 4: Get faculty from same department (fallback)
             if not faculty_list and subject_department:
                 print(f"No faculty-subject mapping found, looking for faculty in {subject_department} department")
                 department_faculty = Faculty.query.filter_by(department=subject_department).all()
@@ -166,10 +230,13 @@ class TimetableOptimizer:
                         'department': faculty.department,
                         'specialization': getattr(faculty, 'specialization', ''),
                         'max_hours_per_week': faculty.max_hours_per_week,
-                        'max_hours_per_day': faculty.max_hours_per_day
+                        'max_hours_per_day': faculty.max_hours_per_day,
+                        'is_primary': False,
+                        'priority': 3,
+                        'match_type': 'department_fallback'
                     })
             
-            # If still no faculty found, get all faculty as last resort
+            # Priority 5: Get all faculty as last resort
             if not faculty_list:
                 print("No department-specific faculty found, using all faculty as fallback")
                 all_faculty = Faculty.query.all()
@@ -181,7 +248,10 @@ class TimetableOptimizer:
                         'department': faculty.department,
                         'specialization': getattr(faculty, 'specialization', ''),
                         'max_hours_per_week': faculty.max_hours_per_week,
-                        'max_hours_per_day': faculty.max_hours_per_day
+                        'max_hours_per_day': faculty.max_hours_per_day,
+                        'is_primary': False,
+                        'priority': 4,
+                        'match_type': 'general_fallback'
                     })
             
             print(f"Found {len(faculty_list)} available faculty members for subject {subject.name}")
@@ -191,8 +261,8 @@ class TimetableOptimizer:
             print(f"Error getting available faculty: {e}")
             return []
     
-    def get_available_classrooms(self, batch_id, requires_lab=False):
-        """Get available classrooms for a batch"""
+    def get_available_classrooms(self, batch_id, requires_lab=False, day_of_week=None, time_slot=None, subject_id=None):
+        """Get available classrooms for a batch using smart allocation"""
         try:
             # Get batch info
             batch = Batch.query.get(batch_id)
@@ -200,6 +270,30 @@ class TimetableOptimizer:
                 print(f"No batch found with id {batch_id}")
                 return []
             
+            # If specific time slot is provided, use smart allocator
+            if day_of_week is not None and time_slot is not None:
+                available_classrooms = self.classroom_allocator.find_available_classrooms(
+                    batch_id, day_of_week, time_slot, subject_id
+                )
+                
+                classrooms_data = []
+                for allocation_info in available_classrooms:
+                    classroom = allocation_info['classroom']
+                    classrooms_data.append({
+                        'id': classroom.id,
+                        'name': classroom.name,
+                        'capacity': classroom.capacity,
+                        'type': classroom.type,
+                        'equipment': classroom.equipment,
+                        'priority_score': allocation_info['priority_score'],
+                        'allocation_type': allocation_info['allocation_type'],
+                        'can_borrow': allocation_info.get('can_borrow', False),
+                        'is_temporary': allocation_info['allocation_type'] == 'temporary_borrow'
+                    })
+                
+                return classrooms_data
+            
+            # Fallback to original logic for general queries
             if requires_lab:
                 classrooms = Classroom.query.filter(
                     Classroom.type == 'lab',
@@ -382,7 +476,7 @@ class TimetableOptimizer:
         # Try to schedule each class
         for subject in required_classes:
             scheduled = False
-            available_faculty = self.get_available_faculty(subject['id'])
+            available_faculty = self.get_available_faculty(subject['id'], batch_id)
             available_classrooms = self.get_available_classrooms(batch_id, subject.get('requires_lab', False))
             block_size = subject.get('block_size', 1)
             
@@ -557,29 +651,44 @@ class TimetableOptimizer:
         return formatted_schedule
     
     def generate_time_slots(self, start_time, end_time, lunch_break_duration, lunch_break_start_time='12:15'):
-        """Generate time slots based on college timing"""
+        """Generate time slots based on college timing with proper Indian college format"""
         slots = []
         current_time = start_time
         end_time_minutes = self.time_to_minutes(end_time)
         lunch_start_time = lunch_break_start_time
         lunch_end_time = self.add_minutes_to_time(lunch_start_time, lunch_break_duration)
         
+        # Standard Indian college periods (50 minutes each with 5-minute breaks)
+        period_duration = 50
+        break_duration = 5
+        
+        period_count = 1
+        
         while self.time_to_minutes(current_time) < end_time_minutes:
-            slot_end_time = self.add_minutes_to_time(current_time, 45)
-            slot = f"{current_time}-{slot_end_time}"
+            slot_end_time = self.add_minutes_to_time(current_time, period_duration)
             
-            # Skip lunch break period
-            if current_time != lunch_start_time:
-                slots.append(slot)
-            
-            # Jump over lunch break
-            if current_time == lunch_start_time:
+            # Check if this period would overlap with lunch break
+            if (self.time_to_minutes(current_time) < self.time_to_minutes(lunch_start_time) and 
+                self.time_to_minutes(slot_end_time) > self.time_to_minutes(lunch_start_time)):
+                # This period would overlap with lunch, so stop before lunch
+                break
+                
+            # Check if we're in lunch break period
+            if (self.time_to_minutes(current_time) >= self.time_to_minutes(lunch_start_time) and 
+                self.time_to_minutes(current_time) < self.time_to_minutes(lunch_end_time)):
+                # Skip to end of lunch break
                 current_time = lunch_end_time
+                continue
+                
+            # Add the time slot if it doesn't exceed end time
+            if self.time_to_minutes(slot_end_time) <= end_time_minutes:
+                slot = f"{current_time}-{slot_end_time}"
+                slots.append(slot)
+                
+                # Move to next period (add period duration + break)
+                current_time = self.add_minutes_to_time(current_time, period_duration + break_duration)
+                period_count += 1
             else:
-                current_time = slot_end_time
-            
-            # Break if we've reached the end time
-            if self.time_to_minutes(current_time) >= end_time_minutes:
                 break
         
         return slots
