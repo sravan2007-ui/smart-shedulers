@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Smart Classroom Scheduler{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+            <small class="text-muted">Welcome back, {{ session.username }}!</small>
+        </h1>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-2">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>{{ stats.classrooms }}</h4>
+                        <p class="mb-0">Classrooms</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-door-open fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>{{ stats.subjects }}</h4>
+                        <p class="mb-0">Subjects</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-book fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>{{ stats.faculty }}</h4>
+                        <p class="mb-0">Faculty</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-chalkboard-teacher fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>{{ stats.batches }}</h4>
+                        <p class="mb-0">Batches</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-users fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card bg-secondary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>{{ stats.timetables }}</h4>
+                        <p class="mb-0">Timetables</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-table fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card bg-dark text-white">
+            <div class="card-body text-center">
+                <a href="{{ url_for('timetable_generator') }}" class="text-white text-decoration-none">
+                    <i class="fas fa-magic fa-2x mb-2"></i>
+                    <p class="mb-0">Generate<br>Timetable</p>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-2">
+                        <a href="{{ url_for('manage_entity', entity='classrooms') }}" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-door-open me-2"></i>Manage Classrooms
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{{ url_for('manage_entity', entity='subjects') }}" class="btn btn-outline-success w-100">
+                            <i class="fas fa-book me-2"></i>Manage Subjects
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{{ url_for('manage_entity', entity='faculty') }}" class="btn btn-outline-info w-100">
+                            <i class="fas fa-chalkboard-teacher me-2"></i>Manage Faculty
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{{ url_for('manage_entity', entity='batches') }}" class="btn btn-outline-warning w-100">
+                            <i class="fas fa-users me-2"></i>Manage Batches
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Timetables -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5><i class="fas fa-clock me-2"></i>Recent Timetables</h5>
+                <a href="{{ url_for('manage_entity', entity='timetables') }}" class="btn btn-sm btn-outline-primary">
+                    View All
+                </a>
+            </div>
+            <div class="card-body">
+                {% if recent_timetables %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Batch</th>
+                                <th>Semester</th>
+                                <th>Academic Year</th>
+                                <th>Status</th>
+                                <th>Created By</th>
+                                <th>Created At</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for timetable in recent_timetables %}
+                            <tr>
+                                <td>{{ timetable.name }}</td>
+                                <td>{{ timetable.batch_name }}</td>
+                                <td>{{ timetable.semester }}</td>
+                                <td>{{ timetable.academic_year }}</td>
+                                <td>
+                                    {% if timetable.status == 'approved' %}
+                                        <span class="badge bg-success">Approved</span>
+                                    {% elif timetable.status == 'draft' %}
+                                        <span class="badge bg-warning">Draft</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">{{ timetable.status|title }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ timetable.created_by_name }}</td>
+                                <td>{{ timetable.created_at[:16] }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-table fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No timetables created yet</h5>
+                    <p class="text-muted">Start by creating your first timetable using the generator.</p>
+                    <a href="{{ url_for('timetable_generator') }}" class="btn btn-primary">
+                        <i class="fas fa-magic me-2"></i>Generate Timetable
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

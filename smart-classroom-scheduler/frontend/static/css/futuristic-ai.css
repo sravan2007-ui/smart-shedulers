@@ -1,0 +1,524 @@
+/* Futuristic AI Scene CSS */
+
+/* AI Scene Container */
+.ai-scene-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+/* AI Robotic Hand */
+.robotic-hand {
+    position: absolute;
+    top: 20%;
+    right: 15%;
+    width: 200px;
+    height: 300px;
+    transform: rotate(-15deg);
+    animation: handFloat 6s ease-in-out infinite;
+}
+
+@keyframes handFloat {
+    0%, 100% { transform: rotate(-15deg) translateY(0px); }
+    50% { transform: rotate(-15deg) translateY(-20px); }
+}
+
+.hand-structure {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.palm {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 120px;
+    background: linear-gradient(135deg, #00d4ff, #5b73ff, #667eea);
+    border-radius: 40px 40px 20px 20px;
+    box-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+    overflow: hidden;
+}
+
+.palm-circuits {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    right: 20px;
+    bottom: 20px;
+    background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.2) 50%, transparent 70%);
+    border-radius: 20px;
+    animation: circuitPulse 3s ease-in-out infinite;
+}
+
+@keyframes circuitPulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.8; }
+}
+
+.finger {
+    position: absolute;
+    width: 15px;
+    height: 80px;
+    background: linear-gradient(180deg, #00d4ff, #5b73ff);
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.4);
+    animation: fingerMove 4s ease-in-out infinite;
+}
+
+.finger-1 {
+    bottom: 100px;
+    left: 20px;
+    animation-delay: 0s;
+}
+
+.finger-2 {
+    bottom: 110px;
+    left: 40px;
+    height: 85px;
+    animation-delay: 0.5s;
+}
+
+.finger-3 {
+    bottom: 105px;
+    left: 60px;
+    height: 82px;
+    animation-delay: 1s;
+}
+
+.finger-4 {
+    bottom: 95px;
+    left: 80px;
+    height: 75px;
+    animation-delay: 1.5s;
+}
+
+.thumb {
+    bottom: 60px;
+    left: 10px;
+    width: 18px;
+    height: 60px;
+    background: linear-gradient(180deg, #00d4ff, #5b73ff);
+    border-radius: 9px;
+    transform: rotate(45deg);
+    animation-delay: 2s;
+}
+
+@keyframes fingerMove {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(10deg); }
+}
+
+.joint {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: #00ffff;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #00ffff;
+    animation: jointGlow 2s ease-in-out infinite;
+}
+
+.joint-1 { top: 25px; left: 50%; transform: translateX(-50%); }
+.joint-2 { top: 50px; left: 50%; transform: translateX(-50%); }
+
+@keyframes jointGlow {
+    0%, 100% { box-shadow: 0 0 10px #00ffff; }
+    50% { box-shadow: 0 0 20px #00ffff, 0 0 30px #00ffff; }
+}
+
+.hand-glow {
+    position: absolute;
+    top: -20px;
+    left: -20px;
+    right: -20px;
+    bottom: -20px;
+    background: radial-gradient(circle, rgba(0, 212, 255, 0.2) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: handGlow 4s ease-in-out infinite;
+}
+
+@keyframes handGlow {
+    0%, 100% { opacity: 0.5; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.1); }
+}
+
+/* Holographic Screen */
+.holographic-screen {
+    position: absolute;
+    top: 15%;
+    left: 20%;
+    width: 500px;
+    height: 350px;
+    perspective: 1000px;
+    animation: screenFloat 8s ease-in-out infinite;
+}
+
+@keyframes screenFloat {
+    0%, 100% { transform: rotateY(5deg) rotateX(2deg) translateY(0px); }
+    50% { transform: rotateY(-5deg) rotateX(-2deg) translateY(-15px); }
+}
+
+.screen-frame {
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+    border: 2px solid #00ffff;
+    border-radius: 15px;
+    background: rgba(0, 255, 255, 0.05);
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+}
+
+.frame-glow {
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    border: 1px solid rgba(0, 255, 255, 0.5);
+    border-radius: 20px;
+    animation: frameGlow 3s ease-in-out infinite;
+}
+
+@keyframes frameGlow {
+    0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 255, 0.3); }
+    50% { box-shadow: 0 0 40px rgba(0, 255, 255, 0.6); }
+}
+
+/* Timetable Grid */
+.timetable-grid {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 20, 40, 0.8);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.grid-lines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.h-line, .v-line {
+    position: absolute;
+    background: linear-gradient(90deg, transparent, #00ffff, transparent);
+    animation: gridPulse 4s ease-in-out infinite;
+}
+
+.h-line {
+    width: 100%;
+    height: 1px;
+}
+
+.v-line {
+    width: 1px;
+    height: 100%;
+    background: linear-gradient(180deg, transparent, #00ffff, transparent);
+}
+
+.line-1 { top: 20%; animation-delay: 0s; }
+.line-2 { top: 40%; animation-delay: 0.5s; }
+.line-3 { top: 60%; animation-delay: 1s; }
+.line-4 { top: 80%; animation-delay: 1.5s; }
+.line-5 { left: 80%; animation-delay: 2s; }
+
+.v-line.line-1 { left: 20%; }
+.v-line.line-2 { left: 40%; }
+.v-line.line-3 { left: 60%; }
+.v-line.line-4 { left: 80%; }
+
+@keyframes gridPulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.8; }
+}
+
+/* Schedule Blocks */
+.schedule-blocks {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.block {
+    position: absolute;
+    width: 80px;
+    height: 50px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: bold;
+    color: white;
+    text-shadow: 0 0 10px currentColor;
+    box-shadow: 0 0 20px currentColor;
+    animation: blockAssemble 6s ease-in-out infinite;
+}
+
+.block-1 {
+    top: 25%;
+    left: 25%;
+    background: linear-gradient(135deg, #ff006e, #8338ec);
+    animation-delay: 0s;
+}
+
+.block-2 {
+    top: 45%;
+    left: 45%;
+    background: linear-gradient(135deg, #3a86ff, #06ffa5);
+    animation-delay: 1s;
+}
+
+.block-3 {
+    top: 65%;
+    left: 25%;
+    background: linear-gradient(135deg, #ffbe0b, #fb5607);
+    animation-delay: 2s;
+}
+
+.block-4 {
+    top: 25%;
+    left: 65%;
+    background: linear-gradient(135deg, #8338ec, #3a86ff);
+    animation-delay: 3s;
+}
+
+.block-5 {
+    top: 65%;
+    left: 65%;
+    background: linear-gradient(135deg, #06ffa5, #ffbe0b);
+    animation-delay: 4s;
+}
+
+@keyframes blockAssemble {
+    0% { 
+        transform: scale(0) rotate(180deg);
+        opacity: 0;
+    }
+    20% {
+        transform: scale(1.2) rotate(0deg);
+        opacity: 1;
+    }
+    80% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+    }
+}
+
+.block-icon {
+    font-size: 16px;
+    margin-bottom: 2px;
+}
+
+.block-text {
+    font-size: 8px;
+    letter-spacing: 1px;
+}
+
+/* Floating Icons */
+.floating-icons {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.icon {
+    position: absolute;
+    font-size: 20px;
+    animation: iconFloat 8s ease-in-out infinite;
+    filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.8));
+}
+
+.classroom-icon {
+    top: 10%;
+    left: 10%;
+    animation-delay: 0s;
+}
+
+.teacher-icon {
+    top: 15%;
+    right: 15%;
+    animation-delay: 1s;
+}
+
+.book-icon {
+    bottom: 20%;
+    left: 15%;
+    animation-delay: 2s;
+}
+
+.clock-icon {
+    bottom: 15%;
+    right: 20%;
+    animation-delay: 3s;
+}
+
+.calendar-icon {
+    top: 50%;
+    left: 5%;
+    animation-delay: 4s;
+}
+
+@keyframes iconFloat {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    25% { transform: translateY(-10px) rotate(5deg); }
+    50% { transform: translateY(-5px) rotate(-5deg); }
+    75% { transform: translateY(-15px) rotate(3deg); }
+}
+
+/* Hologram Effects */
+.hologram-effects {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.scan-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #00ffff, transparent);
+    animation: scanMove 3s linear infinite;
+}
+
+@keyframes scanMove {
+    0% { top: 0%; opacity: 1; }
+    100% { top: 100%; opacity: 0; }
+}
+
+.interference-1, .interference-2 {
+    position: absolute;
+    width: 100%;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    animation: interference 2s linear infinite;
+}
+
+.interference-1 {
+    top: 30%;
+    animation-delay: 0s;
+}
+
+.interference-2 {
+    top: 70%;
+    animation-delay: 1s;
+}
+
+@keyframes interference {
+    0%, 90% { opacity: 0; }
+    95% { opacity: 0.5; }
+    100% { opacity: 0; }
+}
+
+/* Energy Connections */
+.energy-connections {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.connection-beam {
+    position: absolute;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #00ffff, transparent);
+    animation: beamFlow 4s ease-in-out infinite;
+}
+
+.beam-1 {
+    top: 35%;
+    left: 35%;
+    width: 200px;
+    transform: rotate(25deg);
+    animation-delay: 0s;
+}
+
+.beam-2 {
+    top: 50%;
+    left: 40%;
+    width: 150px;
+    transform: rotate(-15deg);
+    animation-delay: 1s;
+}
+
+.beam-3 {
+    top: 65%;
+    left: 45%;
+    width: 180px;
+    transform: rotate(35deg);
+    animation-delay: 2s;
+}
+
+@keyframes beamFlow {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 0.8; }
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .holographic-screen {
+        width: 400px;
+        height: 280px;
+        left: 15%;
+    }
+    
+    .robotic-hand {
+        right: 10%;
+        width: 150px;
+        height: 225px;
+    }
+}
+
+@media (max-width: 768px) {
+    .ai-scene-container {
+        opacity: 0.3;
+    }
+    
+    .holographic-screen {
+        width: 300px;
+        height: 200px;
+        left: 10%;
+        top: 10%;
+    }
+    
+    .robotic-hand {
+        right: 5%;
+        width: 100px;
+        height: 150px;
+        top: 15%;
+    }
+}
+
+@media (max-width: 480px) {
+    .ai-scene-container {
+        display: none;
+    }
+}

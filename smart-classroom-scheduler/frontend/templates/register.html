@@ -1,0 +1,593 @@
+{% extends "base.html" %}
+
+{% block login_content %}
+<div class="ultra-modern-login-container">
+    <!-- Smart Classroom Scheduler Themed Background -->
+    <div class="futuristic-background">
+        <!-- Animated Classroom Grid -->
+        <div class="classroom-grid-system">
+            <div class="classroom-grid"></div>
+        </div>
+        
+        <!-- Floating Classroom Desks -->
+        <div class="floating-desks">
+            <div class="desk"></div>
+            <div class="desk"></div>
+            <div class="desk"></div>
+            <div class="desk"></div>
+            <div class="desk"></div>
+            <div class="desk"></div>
+        </div>
+        
+        <!-- Animated Timetable Blocks -->
+        <div class="timetable-blocks">
+            <div class="schedule-block"></div>
+            <div class="schedule-block"></div>
+            <div class="schedule-block"></div>
+            <div class="schedule-block"></div>
+            <div class="schedule-block"></div>
+        </div>
+        
+        <!-- Floating Academic Icons -->
+        <div class="academic-icons">
+            <div class="academic-icon">📚</div>
+            <div class="academic-icon">🎓</div>
+            <div class="academic-icon">📝</div>
+            <div class="academic-icon">🏫</div>
+            <div class="academic-icon">⏰</div>
+            <div class="academic-icon">📊</div>
+        </div>
+        
+        <!-- Digital Clock -->
+        <div class="digital-clock" id="digitalClock">00:00:00</div>
+        
+        <!-- Animated Chalkboard -->
+        <div class="chalkboard"></div>
+        
+        <!-- Left Side AI Learning Animation -->
+        <div class="ai-learning-scene">
+            <div class="ai-brain-container">
+                <div class="brain-core">
+                    <div class="neural-nodes">
+                        <div class="node node1"></div>
+                        <div class="node node2"></div>
+                        <div class="node node3"></div>
+                        <div class="node node4"></div>
+                        <div class="node node5"></div>
+                        <div class="node node6"></div>
+                    </div>
+                    <div class="neural-connections">
+                        <div class="connection c1"></div>
+                        <div class="connection c2"></div>
+                        <div class="connection c3"></div>
+                        <div class="connection c4"></div>
+                        <div class="connection c5"></div>
+                    </div>
+                </div>
+                
+                <div class="data-processing">
+                    <div class="data-bit bit1">📊</div>
+                    <div class="data-bit bit2">📈</div>
+                    <div class="data-bit bit3">🎯</div>
+                    <div class="data-bit bit4">⚡</div>
+                </div>
+                
+                <div class="learning-progress">
+                    <div class="progress-bar bar1"></div>
+                    <div class="progress-bar bar2"></div>
+                    <div class="progress-bar bar3"></div>
+                </div>
+            </div>
+            
+            <div class="knowledge-elements">
+                <div class="knowledge-item item1">🎓</div>
+                <div class="knowledge-item item2">📚</div>
+                <div class="knowledge-item item3">🔬</div>
+                <div class="knowledge-item item4">💡</div>
+                <div class="knowledge-item item5">🧮</div>
+            </div>
+        </div>
+
+        <!-- Right Side AI Creation Scene -->
+        <div class="ai-creation-scene">
+            <div class="holographic-timetable">
+                <div class="timetable-grid">
+                    <div class="grid-line horizontal" style="top: 20%"></div>
+                    <div class="grid-line horizontal" style="top: 40%"></div>
+                    <div class="grid-line horizontal" style="top: 60%"></div>
+                    <div class="grid-line horizontal" style="top: 80%"></div>
+                    <div class="grid-line vertical" style="left: 25%"></div>
+                    <div class="grid-line vertical" style="left: 50%"></div>
+                    <div class="grid-line vertical" style="left: 75%"></div>
+                </div>
+                
+                <div class="schedule-blocks">
+                    <div class="schedule-block block1"></div>
+                    <div class="schedule-block block2"></div>
+                    <div class="schedule-block block3"></div>
+                    <div class="schedule-block block4"></div>
+                    <div class="schedule-block block5"></div>
+                </div>
+                
+                <div class="floating-icons">
+                    <div class="icon-3d book-icon">📚</div>
+                    <div class="icon-3d clock-icon">⏰</div>
+                    <div class="icon-3d brain-icon">🧠</div>
+                    <div class="icon-3d gear-icon">⚙️</div>
+                </div>
+            </div>
+            
+            <div class="ai-robotic-hand">
+                <div class="hand-base">
+                    <div class="palm"></div>
+                    <div class="finger finger1"></div>
+                    <div class="finger finger2"></div>
+                    <div class="finger finger3"></div>
+                    <div class="finger finger4"></div>
+                    <div class="thumb"></div>
+                </div>
+                
+                <div class="neural-network">
+                    <div class="neural-line n1"></div>
+                    <div class="neural-line n2"></div>
+                    <div class="neural-line n3"></div>
+                    <div class="neural-line n4"></div>
+                </div>
+                
+                <div class="hand-energy-field"></div>
+            </div>
+            
+            <div class="data-streams">
+                <div class="data-stream stream1"></div>
+                <div class="data-stream stream2"></div>
+                <div class="data-stream stream3"></div>
+            </div>
+        </div>
+        
+        <div class="depth-layers">
+            <div class="depth-layer layer1"></div>
+            <div class="depth-layer layer2"></div>
+            <div class="depth-layer layer3"></div>
+        </div>
+    </div>
+    
+    <!-- Register Form -->
+    <div class="login-form-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h1>Create Account</h1>
+                <p>Join the Smart Classroom Scheduler</p>
+            </div>
+            
+            <form method="POST" class="login-form" id="registerForm">
+                <div class="input-group">
+                    <label for="username">Username</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="username" name="username" required placeholder="Choose a username">
+                        <div class="input-glow"></div>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="email">Email</label>
+                    <div class="input-wrapper">
+                        <input type="email" id="email" name="email" required placeholder="Enter your email">
+                        <div class="input-glow"></div>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="password" name="password" required placeholder="Create a password">
+                        <div class="input-glow"></div>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="confirm_password">Confirm Password</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="confirm_password" name="confirm_password" required placeholder="Confirm your password">
+                        <div class="input-glow"></div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="login-button" id="registerButton">
+                    <span id="buttonText">Create Account</span>
+                    <div class="button-glow"></div>
+                    <div class="loading-spinner" id="loadingSpinner"></div>
+                </button>
+            </form>
+            
+            {% if error %}
+                <div class="error-message">{{ error }}</div>
+            {% endif %}
+            
+            <div class="error-message" id="errorMessage" style="display: none;"></div>
+            
+            <div class="auth-links">
+                <p>Already have an account? <a href="/login" class="register-link">Login here</a></p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Registration Success Modal with Classroom Theme -->
+    <div class="success-modal-overlay" id="successModal" style="display: none;">
+        <div class="success-modal">
+            <div class="success-animation">
+                <!-- Classroom Success Scene -->
+                <div class="classroom-success-scene">
+                    <div class="success-classroom"></div>
+                </div>
+                
+                <!-- Academic Confetti -->
+                <div class="academic-confetti" id="academicConfetti"></div>
+                
+                <!-- Success Text -->
+                <div class="success-content">
+                    <h2 class="success-title">Welcome to Smart Classroom Scheduler!</h2>
+                    <p class="success-message">Your account has been created successfully</p>
+                    <div class="success-subtitle">🎓 Ready to schedule your classes efficiently!</div>
+                </div>
+                
+                <!-- Progress Ring -->
+                <div class="progress-ring">
+                    <svg class="progress-ring-svg" width="60" height="60">
+                        <circle class="progress-ring-circle" stroke="#28a745" stroke-width="3" fill="transparent" r="27" cx="30" cy="30"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/modern-login.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/enhanced-register.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/smart-scheduler-animations.css') }}">
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const registerForm = document.getElementById('registerForm');
+    const registerButton = document.getElementById('registerButton');
+    const buttonText = document.getElementById('buttonText');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const errorMessage = document.getElementById('errorMessage');
+    const successModal = document.getElementById('successModal');
+    
+    // Initialize digital clock
+    updateDigitalClock();
+    setInterval(updateDigitalClock, 1000);
+
+    registerForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        // Get form data
+        const username = document.getElementById('username').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirm_password').value;
+        
+        // Clear previous errors
+        errorMessage.style.display = 'none';
+        
+        // Validate passwords match
+        if (password !== confirmPassword) {
+            errorMessage.textContent = 'Passwords do not match';
+            errorMessage.style.display = 'block';
+            return;
+        }
+        
+        // Show loading state
+        registerButton.classList.add('loading');
+        registerButton.disabled = true;
+        
+        try {
+            const response = await fetch('/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username: username,
+                    email: email,
+                    password: password
+                })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                showSuccessModal();
+                setTimeout(() => {
+                    window.location.href = result.redirect_url;
+                }, 3000);
+            } else {
+                errorMessage.textContent = result.message;
+                errorMessage.style.display = 'block';
+                registerButton.classList.remove('loading');
+                registerButton.disabled = false;
+            }
+        } catch (error) {
+            errorMessage.textContent = 'Registration failed. Please try again.';
+            errorMessage.style.display = 'block';
+            registerButton.classList.remove('loading');
+            registerButton.disabled = false;
+        }
+    });
+    
+    function showSuccessModal() {
+        successModal.style.display = 'flex';
+        
+        // Create academic-themed confetti
+        createAcademicConfetti();
+        
+        // Add screen flash effect
+        createScreenFlash();
+        
+        // Add classroom success sound
+        playClassroomSuccessSound();
+        
+        // Animate the classroom scene
+        animateClassroomSuccess();
+    }
+    
+    function createFloatingParticles() {
+        const container = document.querySelector('.success-animation');
+        const colors = ['#00ffff', '#667eea', '#764ba2', '#f093fb'];
+        
+        for (let i = 0; i < 20; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'celebration-particle';
+            particle.style.cssText = `
+                position: absolute;
+                width: ${Math.random() * 8 + 4}px;
+                height: ${Math.random() * 8 + 4}px;
+                background: ${colors[Math.floor(Math.random() * colors.length)]};
+                border-radius: 50%;
+                left: ${Math.random() * 100}%;
+                top: ${Math.random() * 100}%;
+                animation: celebrationFloat ${Math.random() * 3 + 2}s ease-out forwards;
+                box-shadow: 0 0 10px currentColor;
+            `;
+            container.appendChild(particle);
+            
+            // Remove particle after animation
+            setTimeout(() => {
+                if (particle.parentNode) {
+                    particle.parentNode.removeChild(particle);
+                }
+            }, 5000);
+        }
+    }
+    
+    function createConfetti() {
+        const confettiContainer = document.createElement('div');
+        confettiContainer.className = 'confetti-container';
+        confettiContainer.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1001;
+        `;
+        document.body.appendChild(confettiContainer);
+        
+        const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3'];
+        
+        for (let i = 0; i < 50; i++) {
+            const confetti = document.createElement('div');
+            confetti.style.cssText = `
+                position: absolute;
+                width: ${Math.random() * 10 + 5}px;
+                height: ${Math.random() * 10 + 5}px;
+                background: ${colors[Math.floor(Math.random() * colors.length)]};
+                left: ${Math.random() * 100}%;
+                top: -10px;
+                animation: confettiFall ${Math.random() * 3 + 2}s linear forwards;
+                transform: rotate(${Math.random() * 360}deg);
+            `;
+            confettiContainer.appendChild(confetti);
+        }
+        
+        // Remove confetti after animation
+        setTimeout(() => {
+            if (confettiContainer.parentNode) {
+                confettiContainer.parentNode.removeChild(confettiContainer);
+            }
+        }, 5000);
+    }
+    
+    function createScreenFlash() {
+        const flash = document.createElement('div');
+        flash.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            z-index: 999;
+            animation: screenFlash 0.5s ease-out;
+            pointer-events: none;
+        `;
+        document.body.appendChild(flash);
+        
+        setTimeout(() => {
+            if (flash.parentNode) {
+                flash.parentNode.removeChild(flash);
+            }
+        }, 500);
+    }
+    
+    function playSuccessSound() {
+        // Create a simple success sound using Web Audio API
+        try {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(1200, audioContext.currentTime + 0.1);
+            oscillator.frequency.exponentialRampToValueAtTime(600, audioContext.currentTime + 0.2);
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.3);
+        } catch (e) {
+            // Audio not supported, continue silently
+        }
+    }
+    
+    function updateDigitalClock() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('en-US', { hour12: false });
+        const clockElement = document.getElementById('digitalClock');
+        if (clockElement) {
+            clockElement.textContent = timeString;
+        }
+    }
+    
+    function createAcademicConfetti() {
+        const confettiContainer = document.getElementById('academicConfetti');
+        if (!confettiContainer) return;
+        
+        const academicItems = ['book', 'pencil', 'apple', 'star'];
+        const colors = ['#007bff', '#ffc107', '#dc3545', '#28a745'];
+        
+        for (let i = 0; i < 30; i++) {
+            const confetti = document.createElement('div');
+            const itemType = academicItems[Math.floor(Math.random() * academicItems.length)];
+            confetti.className = `confetti-piece ${itemType}`;
+            confetti.style.cssText = `
+                left: ${Math.random() * 100}%;
+                animation-delay: ${Math.random() * 2}s;
+                animation-duration: ${Math.random() * 2 + 3}s;
+            `;
+            confettiContainer.appendChild(confetti);
+        }
+        
+        // Clean up after animation
+        setTimeout(() => {
+            confettiContainer.innerHTML = '';
+        }, 5000);
+    }
+    
+    function animateClassroomSuccess() {
+        const classroom = document.querySelector('.success-classroom');
+        if (classroom) {
+            // Add extra glow effect
+            classroom.style.animation += ', classroomCelebration 2s ease-in-out';
+        }
+    }
+    
+    function playClassroomSuccessSound() {
+        try {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            
+            // Create a pleasant bell-like sound for classroom theme
+            const oscillator1 = audioContext.createOscillator();
+            const oscillator2 = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator1.connect(gainNode);
+            oscillator2.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            // School bell-like frequencies
+            oscillator1.frequency.setValueAtTime(523, audioContext.currentTime); // C5
+            oscillator2.frequency.setValueAtTime(659, audioContext.currentTime); // E5
+            
+            oscillator1.frequency.exponentialRampToValueAtTime(784, audioContext.currentTime + 0.2); // G5
+            oscillator2.frequency.exponentialRampToValueAtTime(1047, audioContext.currentTime + 0.2); // C6
+            
+            gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            
+            oscillator1.start(audioContext.currentTime);
+            oscillator2.start(audioContext.currentTime);
+            oscillator1.stop(audioContext.currentTime + 0.5);
+            oscillator2.stop(audioContext.currentTime + 0.5);
+        } catch (e) {
+            // Audio not supported, continue silently
+        }
+    }
+    
+    // Add celebration animation keyframes
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes celebrationFloat {
+            0% {
+                transform: translateY(0) scale(0);
+                opacity: 1;
+            }
+            50% {
+                transform: translateY(-100px) scale(1);
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-200px) scale(0);
+                opacity: 0;
+            }
+        }
+        
+        .login-button.loading #buttonText {
+            opacity: 0;
+        }
+        
+        .login-button.loading .loading-spinner {
+            display: block;
+        }
+        
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid transparent;
+            border-top: 2px solid #00ffff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        
+        @keyframes confettiFall {
+            0% {
+                transform: translateY(-10px) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes screenFlash {
+            0% {
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+});
+</script>
+{% endblock %}

@@ -1,0 +1,292 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Smart Classroom Scheduler{% endblock %}
+
+{% block content %}
+<!-- Dashboard Header -->
+<div class="dashboard-header text-center mb-4" data-aos="fade-down">
+    <h1 class="dashboard-title">
+        <i class="fas fa-tachometer-alt me-3"></i>
+        Smart Classroom Dashboard
+    </h1>
+    <p class="dashboard-subtitle">
+        Manage your educational resources efficiently and generate optimized timetables
+    </p>
+</div>
+
+<!-- Enhanced Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="stats-card" data-aos="fade-up" data-aos-delay="100">
+            <div class="stats-icon classrooms">
+                <i class="fas fa-door-open"></i>
+            </div>
+            <div class="stats-number" id="classroomCount">{{ stats.total_classrooms }}</div>
+            <div class="stats-label">Total Classrooms</div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="stats-card" data-aos="fade-up" data-aos-delay="200">
+            <div class="stats-icon subjects">
+                <i class="fas fa-book"></i>
+            </div>
+            <div class="stats-number" id="subjectCount">{{ stats.total_subjects }}</div>
+            <div class="stats-label">Total Subjects</div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="stats-card" data-aos="fade-up" data-aos-delay="300">
+            <div class="stats-icon faculty">
+                <i class="fas fa-chalkboard-teacher"></i>
+            </div>
+            <div class="stats-number" id="facultyCount">{{ stats.total_faculty }}</div>
+            <div class="stats-label">Total Faculty</div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="stats-card" data-aos="fade-up" data-aos-delay="400">
+            <div class="stats-icon batches">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stats-number" id="batchCount">{{ stats.total_batches }}</div>
+            <div class="stats-label">Total Batches</div>
+        </div>
+    </div>
+</div>
+
+<!-- Enhanced Quick Actions -->
+<div class="row mb-4">
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="action-card" data-aos="fade-up" data-aos-delay="500">
+            <div class="action-icon">
+                <i class="fas fa-door-open"></i>
+            </div>
+            <div class="action-title">Manage Classrooms</div>
+            <div class="action-description">Add, edit, or remove classroom information and configure lab facilities</div>
+            <a href="{{ url_for('manage_classrooms') }}" class="action-btn">
+                <i class="fas fa-cog me-2"></i>Manage
+            </a>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="action-card" data-aos="fade-up" data-aos-delay="600">
+            <div class="action-icon">
+                <i class="fas fa-book"></i>
+            </div>
+            <div class="action-title">Manage Subjects</div>
+            <div class="action-description">Configure subjects, credits, and lab requirements for curriculum</div>
+            <a href="{{ url_for('manage_subjects') }}" class="action-btn">
+                <i class="fas fa-cog me-2"></i>Manage
+            </a>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="action-card" data-aos="fade-up" data-aos-delay="700">
+            <div class="action-icon">
+                <i class="fas fa-chalkboard-teacher"></i>
+            </div>
+            <div class="action-title">Manage Faculty</div>
+            <div class="action-description">Add faculty members and assign subject specializations</div>
+            <a href="{{ url_for('manage_faculty') }}" class="action-btn">
+                <i class="fas fa-cog me-2"></i>Manage
+            </a>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="action-card" data-aos="fade-up" data-aos-delay="800">
+            <div class="action-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="action-title">Manage Batches</div>
+            <div class="action-description">Configure student batches and their academic schedules</div>
+            <a href="{{ url_for('manage_batches') }}" class="action-btn">
+                <i class="fas fa-cog me-2"></i>Manage
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Timetables -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5><i class="fas fa-clock me-2"></i>Recent Timetables</h5>
+                <a href="{{ url_for('timetable_generator') }}" class="btn btn-sm btn-outline-primary">
+                    View All
+                </a>
+            </div>
+            <div class="card-body">
+                {% if recent_timetables %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Batch</th>
+                                <th>Semester</th>
+                                <th>Academic Year</th>
+                                <th>Status</th>
+                                <th>Created By</th>
+                                <th>Created At</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for timetable in recent_timetables %}
+                            <tr>
+                                <td>{{ timetable.name }}</td>
+                                <td>{{ timetable.batch_name }}</td>
+                                <td>{{ timetable.semester }}</td>
+                                <td>{{ timetable.academic_year }}</td>
+                                <td>
+                                    {% if timetable.status == 'approved' %}
+                                        <span class="badge bg-success">Approved</span>
+                                    {% elif timetable.status == 'draft' %}
+                                        <span class="badge bg-warning">Draft</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">{{ timetable.status|title }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ timetable.created_by_name }}</td>
+                                <td>{{ timetable.created_at[:16] }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4 empty-state">
+                    <i class="fas fa-table fa-3x text-muted mb-3 empty-icon"></i>
+                    <h5 class="text-muted">No timetables created yet</h5>
+                    <p class="text-muted">Start by creating your first timetable using the generator.</p>
+                    <a href="{{ url_for('timetable_generator') }}" class="generate-timetable-btn btn-click-effect">
+                        <i class="fas fa-magic btn-icon"></i>Generate Timetable
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+<script>
+// Initialize AOS
+AOS.init({
+    duration: 800,
+    easing: 'ease-in-out',
+    once: true
+});
+
+// Enhanced counter animation for statistics
+function animateCounters() {
+    $('.stats-number').each(function() {
+        const $this = $(this);
+        const countTo = parseInt($this.text()) || 0;
+        
+        $({ countNum: 0 }).animate({
+            countNum: countTo
+        }, {
+            duration: 2000,
+            easing: 'easeOutQuart',
+            step: function() {
+                $this.text(Math.floor(this.countNum));
+            },
+            complete: function() {
+                $this.text(this.countNum);
+                $this.addClass('animate-counter');
+            }
+        });
+    });
+}
+
+// Load dashboard statistics with enhanced animations
+function loadDashboardStats() {
+    const endpoints = [
+        { url: '/api/classrooms', target: '#classroomCount' },
+        { url: '/api/subjects', target: '#subjectCount' },
+        { url: '/api/faculty', target: '#facultyCount' },
+        { url: '/api/batches', target: '#batchCount' }
+    ];
+    
+    endpoints.forEach(endpoint => {
+        $.get(endpoint.url)
+            .done(function(data) {
+                if (data.success) {
+                    const dataKey = Object.keys(data).find(key => key !== 'success');
+                    const count = dataKey ? data[dataKey].length : 0;
+                    $(endpoint.target).text(count);
+                }
+            })
+            .fail(function() {
+                $(endpoint.target).text('--');
+            });
+    });
+    
+    // Animate counters after a short delay
+    setTimeout(animateCounters, 500);
+}
+
+// Enhanced dashboard interactions
+$(document).ready(function() {
+    loadDashboardStats();
+    
+    // Enhanced card hover effects
+    $('.stats-card, .action-card').hover(
+        function() {
+            $(this).css('transform', 'translateY(-8px) scale(1.02)');
+        },
+        function() {
+            $(this).css('transform', 'translateY(0) scale(1)');
+        }
+    );
+    
+    // Stagger animation for action cards
+    $('.action-card').each(function(index) {
+        $(this).css('animation-delay', (index * 100) + 'ms');
+    });
+    
+    // Add pulse effect to stats icons
+    $('.stats-icon').hover(
+        function() {
+            $(this).addClass('pulse-animation');
+        },
+        function() {
+            $(this).removeClass('pulse-animation');
+        }
+    );
+});
+
+// Add custom CSS for enhanced animations
+$('<style>')
+    .prop('type', 'text/css')
+    .html(`
+        .pulse-animation {
+            animation: pulse 0.6s ease-in-out;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .stats-card:hover .stats-icon {
+            transform: scale(1.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .action-card:hover .action-icon {
+            transform: scale(1.1) rotate(5deg);
+            transition: transform 0.3s ease;
+        }
+    `)
+    .appendTo('head');
+</script>
+{% endblock %}
