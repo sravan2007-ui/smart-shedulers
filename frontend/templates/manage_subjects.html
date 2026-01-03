@@ -1,0 +1,586 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Subjects - Smart Classroom Scheduler{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="animate-slide-in"><i class="fas fa-book me-2 text-primary"></i>Manage Subjects</h1>
+                <p class="text-muted mb-0">Configure subjects, scheduling preferences, and lab requirements</p>
+            </div>
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-primary" id="bulkImportBtn">
+                    <i class="fas fa-upload me-2"></i>Bulk Import
+                </button>
+                <button class="btn btn-primary generate-timetable-btn btn-click-effect" data-bs-toggle="modal"
+                    data-bs-target="#addSubjectModal">
+                    <i class="fas fa-plus btn-icon"></i>Add Subject
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card action-card">
+            <div class="card-header bg-gradient-primary text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-list me-2"></i>Subject Database</h5>
+                    <div class="d-flex gap-2">
+                        <select class="form-select form-select-sm" id="departmentFilter" style="width: auto;">
+                            <option value="">All Departments</option>
+                            <option value="Computer Science">Computer Science</option>
+                            <option value="Electronics">Electronics</option>
+                            <option value="Mechanical">Mechanical</option>
+                            <option value="Civil">Civil</option>
+                            <option value="Mathematics">Mathematics</option>
+                            <option value="Physics">Physics</option>
+                            <option value="Chemistry">Chemistry</option>
+                        </select>
+                        <select class="form-select form-select-sm" id="semesterFilter" style="width: auto;">
+                            <option value="">All Semesters</option>
+                            <option value="1">Semester 1</option>
+                            <option value="2">Semester 2</option>
+                            <option value="3">Semester 3</option>
+                            <option value="4">Semester 4</option>
+                            <option value="5">Semester 5</option>
+                            <option value="6">Semester 6</option>
+                            <option value="7">Semester 7</option>
+                            <option value="8">Semester 8</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- Enhanced Search Container -->
+                <div class="search-container mb-3">
+                    <input type="text" class="search-input" id="subjectSearch"
+                        placeholder="Search subjects by name, code, department, or semester...">
+                    <i class="fas fa-search search-icon"></i>
+                    <div class="search-stats" id="searchStats"></div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover" id="subjectsTable">
+                        <thead class="table-dark">
+                            <tr>
+                                <th><i class="fas fa-book me-1"></i>Name</th>
+                                <th><i class="fas fa-code me-1"></i>Code</th>
+                                <th><i class="fas fa-building me-1"></i>Department</th>
+                                <th><i class="fas fa-calendar me-1"></i>Semester</th>
+                                <th><i class="fas fa-star me-1"></i>Credits</th>
+                                <th><i class="fas fa-clock me-1"></i>Hours/Week</th>
+                                <th><i class="fas fa-calendar-alt me-1"></i>Scheduling</th>
+                                <th><i class="fas fa-flask me-1"></i>Lab</th>
+                                <th><i class="fas fa-cog me-1"></i>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data will be loaded via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Empty State -->
+                <div id="emptyState" class="text-center py-5" style="display: none;">
+                    <div class="empty-state">
+                        <i class="fas fa-book fa-3x text-muted mb-3 empty-icon"></i>
+                        <h5 class="text-muted">No subjects found</h5>
+                        <p class="text-muted">Start by adding your first subject or adjust your search filters.</p>
+                        <button class="generate-timetable-btn btn-click-effect" data-bs-toggle="modal"
+                            data-bs-target="#addSubjectModal">
+                            <i class="fas fa-plus btn-icon"></i>Add First Subject
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Subject Modal -->
+<div class="modal fade" id="addSubjectModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="fas fa-plus me-2"></i>Add New Subject</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addSubjectForm">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label for="name" class="form-label"><i class="fas fa-book me-1"></i>Subject
+                                    Name</label>
+                                <input type="text" class="form-control" id="name" name="name"
+                                    placeholder="e.g., Data Structures and Algorithms" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="code" class="form-label"><i class="fas fa-code me-1"></i>Subject
+                                    Code</label>
+                                <input type="text" class="form-control" id="code" name="code" placeholder="e.g., CS301"
+                                    required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="department" class="form-label"><i
+                                        class="fas fa-building me-1"></i>Department</label>
+                                <select class="form-select" id="department" name="department" required>
+                                    <option value="">Select Department</option>
+                                    <option value="Computer Science">Computer Science & Engineering</option>
+                                    <option value="Electronics">Electronics & Communication</option>
+                                    <option value="Electrical">Electrical & Electronics</option>
+                                    <option value="Mechanical">Mechanical Engineering</option>
+                                    <option value="Civil">Civil Engineering</option>
+                                    <option value="Chemical">Chemical Engineering</option>
+                                    <option value="Mathematics">Mathematics</option>
+                                    <option value="Physics">Physics</option>
+                                    <option value="Chemistry">Chemistry</option>
+                                    <option value="English">English</option>
+                                    <option value="Management">Management Studies</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="semester" class="form-label"><i
+                                        class="fas fa-calendar me-1"></i>Semester</label>
+                                <select class="form-select" id="semester" name="semester" required>
+                                    <option value="">Select Semester</option>
+                                    <option value="1">1st Semester</option>
+                                    <option value="2">2nd Semester</option>
+                                    <option value="3">3rd Semester</option>
+                                    <option value="4">4th Semester</option>
+                                    <option value="5">5th Semester</option>
+                                    <option value="6">6th Semester</option>
+                                    <option value="7">7th Semester</option>
+                                    <option value="8">8th Semester</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="credits" class="form-label"><i class="fas fa-star me-1"></i>Credits</label>
+                                <input type="number" class="form-control" id="credits" name="credits" min="1" max="6"
+                                    value="3" required>
+                                <div class="form-text">Academic credits for this subject</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="hours_per_week" class="form-label"><i class="fas fa-clock me-1"></i>Hours
+                                    per Week</label>
+                                <input type="number" class="form-control" id="hours_per_week" name="hours_per_week"
+                                    min="1" max="10" value="3" required>
+                                <div class="form-text">Total teaching hours per week</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="subject_type" class="form-label"><i class="fas fa-tag me-1"></i>Subject
+                                    Type</label>
+                                <select class="form-select" id="subject_type" name="subject_type">
+                                    <option value="theory">Theory</option>
+                                    <option value="practical">Practical/Lab</option>
+                                    <option value="theory_practical">Theory + Practical</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Advanced Scheduling Options -->
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h6 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Scheduling Preferences</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="scheduling_preference" class="form-label">Class Duration
+                                            Preference</label>
+                                        <select class="form-select" id="scheduling_preference"
+                                            name="scheduling_preference" required>
+                                            <option value="single">Single (45 min)</option>
+                                            <option value="double">Double (90 min)</option>
+                                            <option value="triple">Triple (135 min)</option>
+                                            <option value="lab">Lab (180 min)</option>
+                                        </select>
+                                        <div class="form-text">
+                                            <strong>Single:</strong> 1 period (45m)<br>
+                                            <strong>Double:</strong> 2 periods (90m)<br>
+                                            <strong>Triple:</strong> 3 periods (135m)<br>
+                                            <strong>Lab:</strong> 4 periods (180m) - Fixed Morning/Evening
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3" id="continuous_block_size_container" style="display: none;">
+                                        <label for="continuous_block_size" class="form-label">Continuous Block
+                                            Size</label>
+                                        <select class="form-select" id="continuous_block_size"
+                                            name="continuous_block_size">
+                                            <option value="2">2 Classes (100 minutes)</option>
+                                            <option value="3">3 Classes (150 minutes)</option>
+                                        </select>
+                                        <div class="form-text">Number of 50-minute classes to combine into one block
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-check mb-2">
+                                        <input type="checkbox" class="form-check-input" id="requires_lab"
+                                            name="requires_lab">
+                                        <label class="form-check-label" for="requires_lab">
+                                            <i class="fas fa-flask me-1"></i>Requires Laboratory
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input type="checkbox" class="form-check-input" id="requires_projector"
+                                            name="requires_projector">
+                                        <label class="form-check-label" for="requires_projector">
+                                            <i class="fas fa-video me-1"></i>Requires Projector
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check mb-2">
+                                        <input type="checkbox" class="form-check-input" id="avoid_first_period"
+                                            name="avoid_first_period">
+                                        <label class="form-check-label" for="avoid_first_period">
+                                            <i class="fas fa-clock me-1"></i>Avoid First Period
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input type="checkbox" class="form-check-input" id="avoid_last_period"
+                                            name="avoid_last_period">
+                                        <label class="form-check-label" for="avoid_last_period">
+                                            <i class="fas fa-clock me-1"></i>Avoid Last Period
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveSubject()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Subject Modal -->
+<div class="modal fade" id="editSubjectModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Subject</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editSubjectForm">
+                    <input type="hidden" id="editSubjectId" name="id">
+                    <div class="mb-3">
+                        <label for="editName" class="form-label">Subject Name</label>
+                        <input type="text" class="form-control" id="editName" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editCode" class="form-label">Subject Code</label>
+                        <input type="text" class="form-control" id="editCode" name="code" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editDepartment" class="form-label">Department</label>
+                        <select class="form-select" id="editDepartment" name="department" required>
+                            <option value="">Select Department</option>
+                            <option value="Computer Science">Computer Science</option>
+                            <option value="Mathematics">Mathematics</option>
+                            <option value="Physics">Physics</option>
+                            <option value="Chemistry">Chemistry</option>
+                            <option value="Electronics">Electronics</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editSemester" class="form-label">Semester</label>
+                        <select class="form-select" id="editSemester" name="semester" required>
+                            <option value="">Select Semester</option>
+                            <option value="1">1st Semester</option>
+                            <option value="2">2nd Semester</option>
+                            <option value="3">3rd Semester</option>
+                            <option value="4">4th Semester</option>
+                            <option value="5">5th Semester</option>
+                            <option value="6">6th Semester</option>
+                            <option value="7">7th Semester</option>
+                            <option value="8">8th Semester</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editCredits" class="form-label">Credits</label>
+                        <input type="number" class="form-control" id="editCredits" name="credits" min="1" max="6"
+                            required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editClassesPerWeek" class="form-label">Classes per Week</label>
+                        <input type="number" class="form-control" id="editClassesPerWeek" name="classes_per_week"
+                            min="1" max="10" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editSchedulingPreference" class="form-label">Scheduling Preference</label>
+                        <select class="form-select" id="editSchedulingPreference" name="scheduling_preference" required>
+                            <option value="single">Single (45 min)</option>
+                            <option value="double">Double (90 min)</option>
+                            <option value="triple">Triple (135 min)</option>
+                            <option value="lab">Lab (180 min)</option>
+                        </select>
+                        <div class="form-text">
+                            <strong>Single:</strong> 1 period (45m)<br>
+                            <strong>Double:</strong> 2 periods (90m)<br>
+                            <strong>Triple:</strong> 3 periods (135m)<br>
+                            <strong>Lab:</strong> 4 periods (180m) - Fixed Morning/Evening
+                        </div>
+                    </div>
+                    <div class="mb-3" id="editContinuousBlockSizeContainer" style="display: none;">
+                        <label for="editContinuousBlockSize" class="form-label">Continuous Block Size</label>
+                        <select class="form-select" id="editContinuousBlockSize" name="continuous_block_size">
+                            <option value="2">2 Classes (90 minutes)</option>
+                            <option value="3">3 Classes (135 minutes)</option>
+                        </select>
+                        <div class="form-text">Number of 45-minute classes to combine into one block</div>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="editRequiresLab" name="requires_lab">
+                        <label class="form-check-label" for="editRequiresLab">
+                            Requires Laboratory
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="updateSubject()">Update</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function () {
+        loadSubjects();
+        initializeSearch('subjectsTable', 'subjectSearch');
+
+        // Handle scheduling preference changes
+        $('#scheduling_preference').on('change', function () {
+            handlePreferenceChange('continuous_block_size_container', 'requires_lab', $(this).val());
+        });
+
+        $('#editSchedulingPreference').on('change', function () {
+            handlePreferenceChange('editContinuousBlockSizeContainer', 'editRequiresLab', $(this).val());
+        });
+    });
+
+    function handlePreferenceChange(containerId, labCheckboxId, preference) {
+        const container = $('#' + containerId);
+        const labCheckbox = $('#' + labCheckboxId);
+
+        // Hide continuous block size by default as it's implied by preference now
+        container.hide();
+
+        if (preference === 'lab') {
+            labCheckbox.prop('checked', true);
+            labCheckbox.prop('disabled', true);
+        } else {
+            labCheckbox.prop('disabled', false);
+            if (preference === 'single') {
+                labCheckbox.prop('checked', false);
+            }
+        }
+    }
+
+    function loadSubjects() {
+        $.get('/api/subjects', function (data) {
+            const tbody = $('#subjectsTable tbody');
+            tbody.empty();
+
+            if (data && data.success && data.subjects && data.subjects.length > 0) {
+                data.subjects.forEach(function (subject) {
+                    const row = `
+                    <tr>
+                        <td>${subject.name}</td>
+                        <td><code>${subject.code}</code></td>
+                        <td>${subject.department}</td>
+                        <td>${subject.semester}</td>
+                        <td>${subject.credits}</td>
+                        <td>${subject.hours_per_week}</td>
+                        <td><span class="badge bg-info">${subject.scheduling_preference || 'single'}</span></td>
+                        <td>${subject.requires_lab ? '<span class="badge bg-success">Yes</span>' : '<span class="badge bg-secondary">No</span>'}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" onclick="editSubject(${subject.id})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteSubject(${subject.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                    tbody.append(row);
+                });
+            } else {
+                tbody.append('<tr><td colspan="9" class="text-center">No subjects found</td></tr>');
+            }
+        }).fail(function (xhr, status, error) {
+            console.error('Error loading subjects:', xhr.responseText);
+            const tbody = $('#subjectsTable tbody');
+            tbody.empty();
+            tbody.append('<tr><td colspan="9" class="text-center text-danger">Error loading subjects</td></tr>');
+        });
+    }
+
+    function saveSubject() {
+        const formData = {
+            name: $('#name').val(),
+            code: $('#code').val(),
+            department: $('#department').val(),
+            semester: parseInt($('#semester').val()),
+            credits: parseInt($('#credits').val()),
+            hours_per_week: parseInt($('#classes_per_week').val()),
+            requires_lab: $('#requires_lab').is(':checked'),
+            scheduling_preference: $('#scheduling_preference').val(),
+            continuous_block_size: parseInt($('#continuous_block_size').val()) || 2
+        };
+
+        $.ajax({
+            url: '/api/subjects',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(formData),
+            success: function (response) {
+                if (response.success) {
+                    $('#addSubjectModal').modal('hide');
+                    $('#addSubjectForm')[0].reset();
+                    loadSubjects();
+                    showAlert('Subject added successfully!', 'success');
+                }
+            },
+            error: function () {
+                showAlert('Error adding subject!', 'danger');
+            }
+        });
+    }
+
+    function editSubject(id) {
+        $.get('/api/subjects', function (data) {
+            let subject = null;
+            if (data && data.success && Array.isArray(data.subjects)) {
+                subject = data.subjects.find(s => s.id === id);
+            }
+            if (subject) {
+                $('#editSubjectId').val(subject.id);
+                $('#editName').val(subject.name);
+                $('#editCode').val(subject.code);
+                $('#editSemester').val(subject.semester);
+                $('#editDepartment').val(subject.department);
+                $('#editCredits').val(subject.credits);
+                $('#editClassesPerWeek').val(subject.hours_per_week);
+                $('#editRequiresLab').prop('checked', subject.requires_lab);
+                $('#editSchedulingPreference').val(subject.scheduling_preference || 'single');
+
+                // Trigger change event to set UI state
+                $('#editSchedulingPreference').trigger('change');
+
+                // Show/hide continuous block size field based on preference
+                // toggleContinuousBlockSize('editContinuousBlockSizeContainer', subject.scheduling_preference || 'single');
+
+                $('#editSubjectModal').modal('show');
+            } else {
+                showAlert('Subject not found!', 'danger');
+            }
+        }).fail(function (xhr, status, error) {
+            console.error('Error loading subject data:', xhr.responseText);
+            showAlert('Error loading subject data!', 'danger');
+        });
+    }
+
+    function updateSubject() {
+        const id = $('#editSubjectId').val();
+        const formData = {
+            name: $('#editName').val(),
+            code: $('#editCode').val(),
+            semester: parseInt($('#editSemester').val()),
+            department: $('#editDepartment').val(),
+            credits: parseInt($('#editCredits').val()),
+            hours_per_week: parseInt($('#editClassesPerWeek').val()),
+            requires_lab: $('#editRequiresLab').is(':checked'),
+            scheduling_preference: $('#editSchedulingPreference').val(),
+            continuous_block_size: parseInt($('#editContinuousBlockSize').val()) || 2
+        };
+
+        $.ajax({
+            url: `/api/subjects/${id}`,
+            method: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify(formData),
+            success: function (response) {
+                if (response.success) {
+                    $('#editSubjectModal').modal('hide');
+                    showAlert('Subject updated successfully!', 'success');
+                    loadSubjects();
+                } else {
+                    showAlert(response.error || 'Error updating subject!', 'danger');
+                }
+            },
+            error: function (xhr) {
+                const errorMsg = xhr.responseJSON?.error || 'Error updating subject!';
+                showAlert(errorMsg, 'danger');
+            }
+        });
+    }
+
+    // Handle edit subject form submission
+    $('#editSubjectForm').on('submit', function (e) {
+        e.preventDefault();
+        updateSubject();
+    });
+
+    function deleteSubject(id) {
+        if (confirm('Are you sure you want to delete this subject?')) {
+            $.ajax({
+                url: `/api/subjects/${id}`,
+                method: 'DELETE',
+                success: function (response) {
+                    if (response.success) {
+                        showAlert('Subject deleted successfully!', 'success');
+                        loadSubjects();
+                    } else {
+                        showAlert(response.error || 'Error deleting subject!', 'danger');
+                    }
+                },
+                error: function (xhr) {
+                    const errorMsg = xhr.responseJSON?.error || 'Error deleting subject!';
+                    showAlert(errorMsg, 'danger');
+                }
+            });
+        }
+    }
+</script>
+{% endblock %}

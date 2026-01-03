@@ -1,0 +1,959 @@
+{% extends "base.html" %}
+
+{% block title %}Timetable Generator - Smart Classroom Scheduler{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="fas fa-magic me-2"></i>Timetable Generator
+            <small class="text-muted">Generate optimized timetables automatically</small>
+        </h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-cogs me-2"></i>Generation Parameters</h5>
+            </div>
+            <div class="card-body">
+                <form id="timetableGeneratorForm">
+                    <div class="mb-3">
+                        <label for="batch_id" class="form-label">Select Batch</label>
+                        <select class="form-select" id="batch_id" name="batch_id" required>
+                            <option value="">Choose a batch...</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="semester" class="form-label">
+                            <i class="fas fa-graduation-cap me-1"></i>Semester
+                        </label>
+                        <select class="form-select" id="semester" name="semester" required>
+                            <option value="">Select Semester</option>
+                            <option value="1">1st Semester</option>
+                            <option value="2">2nd Semester</option>
+                            <option value="3">3rd Semester</option>
+                            <option value="4">4th Semester</option>
+                            <option value="5">5th Semester</option>
+                            <option value="6">6th Semester</option>
+                            <option value="7">7th Semester</option>
+                            <option value="8">8th Semester</option>
+                        </select>
+                        <div class="form-text">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Will be automatically filled when you select a batch
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="academic_year" class="form-label">
+                            <i class="fas fa-calendar-alt me-1"></i>Academic Year
+                        </label>
+                        <select class="form-select" id="academic_year" name="academic_year" required>
+                            <option value="">Select Academic Year</option>
+                        </select>
+                        <div class="form-text">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Will be automatically selected when you choose a batch
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="college_name" class="form-label">College Name</label>
+                        <input type="text" class="form-control" id="college_name" name="college_name" 
+                               placeholder="e.g., SRKR Engg. College (A) (Affiliated to JNTU Kakinada), Bhimavaram-534 204, India" 
+                               value="SRKR Engg. College (A) (Affiliated to JNTU Kakinada), Bhimavaram-534 204, India">
+                        <div class="form-text">This will appear in the PDF header</div>
+                    </div>
+                    
+                    <!-- College Timing Configuration -->
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h6 class="mb-0"><i class="fas fa-clock me-2"></i>College Timing</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="form-label"><i class="fas fa-play me-1"></i>Start Time:</label>
+                                    <select class="form-select" id="college_start_time">
+                                        <option value="08:00">8:00 AM</option>
+                                        <option value="08:30">8:30 AM</option>
+                                        <option value="09:00" selected>9:00 AM</option>
+                                        <option value="09:30">9:30 AM</option>
+                                        <option value="10:00">10:00 AM</option>
+                                    </select>
+                                    <div class="form-text">College day start time</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label"><i class="fas fa-stop me-1"></i>End Time:</label>
+                                    <select class="form-select" id="college_end_time">
+                                        <option value="15:00">3:00 PM</option>
+                                        <option value="15:30">3:30 PM</option>
+                                        <option value="16:00">4:00 PM</option>
+                                        <option value="16:30" selected>4:30 PM</option>
+                                        <option value="17:00">5:00 PM</option>
+                                        <option value="17:30">5:30 PM</option>
+                                        <option value="18:00">6:00 PM</option>
+                                    </select>
+                                    <div class="form-text">College day end time</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Break Time Options -->
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h6 class="mb-0"><i class="fas fa-coffee me-2"></i>Break Configuration</h6>
+                        </div>
+                        <div class="card-body">
+                            <!-- Optional Short Break -->
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="include_short_break">
+                                <label class="form-check-label" for="include_short_break">
+                                    Include Short Break (Optional)
+                                </label>
+                            </div>
+                            <div class="mt-2" id="short_break_options" style="display: none;">
+                                <label class="form-label">Break Duration:</label>
+                                <select class="form-select form-select-sm" id="short_break_duration">
+                                    <option value="5">5 minutes</option>
+                                    <option value="10" selected>10 minutes</option>
+                                    <option value="15">15 minutes</option>
+                                    <option value="20">20 minutes</option>
+                                </select>
+                            </div>
+                            
+                            <hr class="my-3">
+                            
+                            <!-- Lunch Break -->
+                            <div class="mb-2">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-utensils me-1"></i>Lunch Break Start Time:
+                                </label>
+                                <select class="form-select" id="lunch_break_start_time">
+                                    <option value="12:00" selected>12:00 PM</option>
+                                    <option value="12:15">12:15 PM</option>
+                                    <option value="12:30">12:30 PM</option>
+                                    <option value="12:45">12:45 PM</option>
+                                    <option value="13:00">1:00 PM</option>
+                                    <option value="13:15">1:15 PM</option>
+                                </select>
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Lunch break will be automatically positioned within your college hours
+                                </div>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-utensils me-1"></i>Lunch Break Duration:
+                                </label>
+                                <select class="form-select" id="lunch_break_duration">
+                                    <option value="45">45 minutes</option>
+                                    <option value="60">60 minutes</option>
+                                    <option value="90" selected>90 minutes</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-grid">
+                        <button type="button" class="btn btn-primary" onclick="generateTimetable()">
+                            <i class="fas fa-magic me-2"></i>Generate Timetable Options
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-chart-line me-2"></i>Generated Options</h5>
+            </div>
+            <div class="card-body">
+                <div id="loadingSpinner" class="text-center d-none">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Generating...</span>
+                    </div>
+                    <p class="mt-2">Generating optimized timetables...</p>
+                </div>
+                
+                <div id="timetableOptions" class="d-none">
+                    <!-- Generated options will appear here -->
+                </div>
+                
+                <div id="noOptions" class="text-center text-muted">
+                    <i class="fas fa-calendar-plus fa-3x mb-3"></i>
+                    <h5>No timetables generated yet</h5>
+                    <p>Select parameters and click "Generate Timetable Options" to create optimized timetables.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Timetable Preview Modal -->
+<div class="modal fade" id="timetablePreviewModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Timetable Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="timetablePreview">
+                    <!-- Timetable preview will be loaded here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="saveTimetableBtn" onclick="saveTimetable()">
+                    <i class="fas fa-save me-2"></i>Save Timetable
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Save Timetable Modal -->
+<div class="modal fade" id="saveTimetableModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Save Timetable</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="saveTimetableForm">
+                    <div class="mb-3">
+                        <label for="timetableName" class="form-label">Timetable Name</label>
+                        <input type="text" class="form-control" id="timetableName" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Selected Option</label>
+                        <div id="selectedOptionInfo" class="p-2 bg-light rounded">
+                            <!-- Selected option info will appear here -->
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="confirmSaveTimetable()">
+                    <i class="fas fa-save me-2"></i>Save
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let generatedOptions = [];
+let selectedOption = null;
+
+$(document).ready(function() {
+    loadBatches();
+    loadAcademicYears();
+    
+    // Add event listener for batch selection change
+    $('#batch_id').on('change', function() {
+        const batchId = $(this).val();
+        loadBatchDetails(batchId);
+    });
+    
+    // Toggle short break options visibility
+    $('#include_short_break').change(function() {
+        if ($(this).is(':checked')) {
+            $('#short_break_options').show();
+        } else {
+            $('#short_break_options').hide();
+        }
+    });
+});
+
+function loadBatches() {
+    $.get('/api/batches', function(data) {
+        const select = $('#batch_id');
+        select.empty().append('<option value="">Choose a batch...</option>');
+        
+        if (data && data.success && data.batches && Array.isArray(data.batches)) {
+            data.batches.forEach(function(batch) {
+                const option = `<option value="${batch.id}">${batch.name} - ${batch.department} (Sem ${batch.semester})</option>`;
+                select.append(option);
+            });
+        } else {
+            console.error('Invalid batches data:', data);
+        }
+    }).fail(function(xhr, status, error) {
+        console.error('Error loading batches:', error);
+        alert('Error loading batches. Please refresh the page.');
+    });
+}
+
+function loadAcademicYears() {
+    $.get('/api/academic-years', function(data) {
+        const select = $('#academic_year');
+        select.empty().append('<option value="">Select Academic Year</option>');
+        
+        if (data && data.success && data.academic_years && Array.isArray(data.academic_years)) {
+            data.academic_years.forEach(function(year) {
+                const option = `<option value="${year}">${year}</option>`;
+                select.append(option);
+            });
+        } else {
+            console.error('Invalid academic years data:', data);
+        }
+    }).fail(function(xhr, status, error) {
+        console.error('Error loading academic years:', error);
+    });
+}
+
+function loadBatchDetails(batchId) {
+    if (!batchId) {
+        // Clear academic year if no batch selected
+        $('#academic_year').val('');
+        $('#semester').val('');
+        return;
+    }
+    
+    $.get(`/api/batches/${batchId}/details`, function(data) {
+        if (data && data.success && data.batch) {
+            const batch = data.batch;
+            
+            // Auto-populate academic year
+            if (batch.academic_year) {
+                $('#academic_year').val(batch.academic_year);
+            }
+            
+            // Auto-populate semester
+            if (batch.semester) {
+                $('#semester').val(batch.semester);
+            }
+            
+            // Add visual feedback for both fields
+            const academicYearField = $('#academic_year');
+            const semesterField = $('#semester');
+            
+            academicYearField.addClass('auto-populated');
+            semesterField.addClass('auto-populated');
+            
+            setTimeout(() => {
+                academicYearField.removeClass('auto-populated');
+                semesterField.removeClass('auto-populated');
+            }, 2000);
+            
+            console.log(`Auto-populated: Academic Year: ${batch.academic_year}, Semester: ${batch.semester}`);
+        }
+    }).fail(function(xhr, status, error) {
+        console.error('Error loading batch details:', error);
+    });
+}
+
+function generateTimetable() {
+    const batchId = $('#batch_id').val();
+    const semester = $('#semester').val();
+    const academicYear = $('#academic_year').val();
+    const collegeName = $('#college_name').val();
+    const includeShortBreak = $('#include_short_break').is(':checked');
+    const shortBreakDuration = parseInt($('#short_break_duration').val()) || 10;
+    const collegeStartTime = $('#college_start_time').val() || '09:00';
+    const collegeEndTime = $('#college_end_time').val() || '16:30';
+    const lunchBreakDuration = parseInt($('#lunch_break_duration').val()) || 60;
+    const lunchBreakStartTime = $('#lunch_break_start_time').val() || '12:15';
+    
+    if (!batchId || !semester || !academicYear) {
+        showAlert('Please fill in all required fields!', 'warning');
+        return;
+    }
+    
+    // Validate lunch break timing
+    const startMinutes = timeToMinutes(collegeStartTime);
+    const endMinutes = timeToMinutes(collegeEndTime);
+    const lunchStartMinutes = timeToMinutes(lunchBreakStartTime);
+    const lunchEndMinutes = lunchStartMinutes + lunchBreakDuration;
+    
+    if (lunchStartMinutes <= startMinutes || lunchEndMinutes >= endMinutes) {
+        showAlert('Lunch break must fall within college operating hours!', 'warning');
+        return;
+    }
+    
+    $('#loadingSpinner').removeClass('d-none');
+    $('#noOptions').addClass('d-none');
+    $('#timetableOptions').addClass('d-none');
+    
+    const requestData = {
+        batch_id: parseInt(batchId),
+        semester: parseInt(semester),
+        academic_year: academicYear,
+        college_name: collegeName,
+        include_short_break: includeShortBreak,
+        short_break_duration: shortBreakDuration,
+        college_start_time: collegeStartTime,
+        college_end_time: collegeEndTime,
+        lunch_break_duration: lunchBreakDuration,
+        lunch_break_start_time: lunchBreakStartTime
+    };
+    
+    $.ajax({
+        url: '/api/generate-timetable',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(requestData),
+        success: function(response) {
+            $('#loadingSpinner').addClass('d-none');
+            console.log('Timetable generation response:', response);
+            
+            if (response.success && response.options && response.options.length > 0) {
+                generatedOptions = response.options;
+                $('#timetableOptions').removeClass('d-none');
+                $('#noOptions').addClass('d-none');
+                displayTimetableOptions(response.options);
+                showAlert(`Successfully generated ${response.options.length} timetable options!`, 'success');
+            } else {
+                showAlert('No timetable options could be generated. Please check your data and try again.', 'warning');
+                $('#noOptions').removeClass('d-none');
+                $('#timetableOptions').addClass('d-none');
+            }
+        },
+        error: function(xhr, status, error) {
+            $('#loadingSpinner').addClass('d-none');
+            $('#noOptions').removeClass('d-none');
+            console.error('Error generating timetables:', xhr.responseText);
+            let errorMsg = 'Error generating timetables!';
+            try {
+                const response = JSON.parse(xhr.responseText);
+                if (response.error) {
+                    errorMsg = response.error;
+                }
+            } catch (e) {
+                errorMsg = 'Error generating timetables: ' + error;
+            }
+            showAlert(errorMsg, 'danger');
+        }
+    });
+}
+
+function displayTimetableOptions(options) {
+    const container = $('#timetableOptions');
+    container.empty();
+    
+    if (!options || !Array.isArray(options) || options.length === 0) {
+        container.html('<div class="alert alert-warning">No timetable options generated. Please try again.</div>');
+        return;
+    }
+    
+    options.forEach(function(option, index) {
+        const optionCard = `
+            <div class="card mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">
+                        <i class="fas fa-star me-2"></i>Option ${option.option_id}
+                        <span class="badge bg-primary ms-2">Score: ${option.score.toFixed(1)}</span>
+                    </h6>
+                    <div>
+                        <button class="btn btn-sm btn-outline-info" onclick="previewTimetable(${index})">
+                            <i class="fas fa-eye me-1"></i>Preview
+                        </button>
+                        <button class="btn btn-sm btn-success" onclick="selectTimetable(${index})">
+                            <i class="fas fa-check me-1"></i>Select
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <small class="text-muted">Total Classes: <strong>${option.total_classes}</strong></small>
+                        </div>
+                        <div class="col-md-6">
+                            <small class="text-muted">Optimization Score: <strong>${option.score.toFixed(1)}/100</strong></small>
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar" role="progressbar" style="width: ${option.score}%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        container.append(optionCard);
+    });
+    
+    container.removeClass('d-none');
+}
+
+function previewTimetable(optionIndex) {
+    const option = generatedOptions[optionIndex];
+    const timetableHtml = generateTimetableGrid(option.schedule);
+    
+    $('#timetablePreview').html(timetableHtml);
+    $('#timetablePreviewModal').modal('show');
+}
+
+function generateTimetableHTML(schedule) {
+    return generateTimetableGrid(schedule);
+}
+
+function selectTimetable(optionIndex) {
+    selectedOption = generatedOptions[optionIndex];
+    
+    // Generate default name
+    const batchName = $('#batch_id option:selected').text().split(' - ')[0];
+    const semester = $('#semester').val();
+    const academicYear = $('#academic_year').val();
+    const defaultName = `${batchName}_Sem${semester}_${academicYear}_Option${selectedOption.option_id}`;
+    
+    $('#timetableName').val(defaultName);
+    $('#selectedOptionInfo').html(`
+        <strong>Option ${selectedOption.option_id}</strong><br>
+        Score: ${selectedOption.score.toFixed(1)}/100<br>
+        Total Classes: ${selectedOption.total_classes}
+    `);
+    
+    $('#saveTimetableModal').modal('show');
+}
+
+function saveTimetable() {
+    if (!selectedOption) {
+        showAlert('Please select a timetable option first!', 'warning');
+        return;
+    }
+    
+    $('#saveTimetableModal').modal('show');
+}
+
+function confirmSaveTimetable() {
+    const timetableName = $('#timetableName').val();
+    
+    if (!timetableName) {
+        showAlert('Please enter a timetable name!', 'warning');
+        return;
+    }
+    
+    const requestData = {
+        name: timetableName,
+        batch_id: parseInt($('#batch_id').val()),
+        semester: parseInt($('#semester').val()),
+        academic_year: $('#academic_year').val(),
+        college_name: $('#college_name').val(),  // ADD COLLEGE NAME HERE
+        college_start_time: $('#college_start_time').val() || '09:00',
+        college_end_time: $('#college_end_time').val() || '16:30',
+        lunch_break_start_time: $('#lunch_break_start_time').val() || '12:15',
+        lunch_break_duration: parseInt($('#lunch_break_duration').val()) || 60,
+        include_short_break: $('#include_short_break').is(':checked'),
+        short_break_duration: parseInt($('#short_break_duration').val()) || 10,
+        entries: selectedOption.schedule.map(entry => ({
+            day: entry.day_index,
+            time_slot: entry.time_slot,
+            subject_id: entry.subject_id,
+            faculty_id: entry.faculty_id,
+            classroom_id: entry.classroom_id
+        }))
+    };
+    
+    $.ajax({
+        url: '/api/save-timetable',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(requestData),
+        success: function(response) {
+            if (response.success) {
+                $('#saveTimetableModal').modal('hide');
+                $('#timetablePreviewModal').modal('hide');
+                showAlert('Timetable saved successfully!', 'success');
+                
+                // Reset form
+                $('#timetableGeneratorForm')[0].reset();
+                $('#timetableOptions').addClass('d-none');
+                $('#noOptions').removeClass('d-none');
+                generatedOptions = [];
+                selectedOption = null;
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Save error:', xhr.responseText);
+            let errorMessage = 'Error saving timetable!';
+            if (xhr.responseJSON && xhr.responseJSON.error) {
+                errorMessage = xhr.responseJSON.error;
+            }
+            showAlert(errorMessage, 'danger');
+        }
+    });
+}
+
+// Helper function to convert 24-hour time to 12-hour format
+function convertTo12Hour(time24) {
+    const [hours, minutes] = time24.split(':');
+    const hour = parseInt(hours);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const hour12 = hour % 12 || 12;
+    return `${hour12}:${minutes} ${ampm}`;
+}
+
+// Helper function to convert time slot to 12-hour format
+function convertTimeSlotTo12Hour(timeSlot) {
+    if (timeSlot.includes('-')) {
+        const [startTime, endTime] = timeSlot.split('-');
+        return `${convertTo12Hour(startTime)} - ${convertTo12Hour(endTime)}`;
+    }
+    return timeSlot;
+}
+
+function generateTimetableGrid(scheduleData, breakConfig = null) {
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    
+    // Get current form values for timing configuration
+    const collegeStartTime = $('#college_start_time').val() || '09:00';
+    const collegeEndTime = $('#college_end_time').val() || '16:30';
+    const includeShortBreak = $('#include_short_break').is(':checked');
+    const shortBreakDuration = parseInt($('#short_break_duration').val()) || 10;
+    const lunchBreakDuration = parseInt($('#lunch_break_duration').val()) || 60;
+    const lunchBreakStartTime = $('#lunch_break_start_time').val() || '12:15';
+    
+    // Generate dynamic time slots based on college timing (including breaks)
+    const timeSlots = generateFullSchedule(collegeStartTime, collegeEndTime, includeShortBreak, shortBreakDuration, lunchBreakDuration, lunchBreakStartTime);
+    
+    // Dynamic break slots based on current configuration
+    let breakSlots = {};
+    
+    // Use selected lunch break start time
+    const lunchStartTime = lunchBreakStartTime;
+    const lunchEndTime = addMinutesToTime(lunchStartTime, lunchBreakDuration);
+    breakSlots[`${lunchStartTime}-${lunchEndTime}`] = 'Lunch Break';
+    
+    console.log('Lunch break configuration:', {
+        lunchBreakDuration,
+        lunchStartTime,
+        lunchEndTime,
+        breakSlot: `${lunchStartTime}-${lunchEndTime}`
+    });
+    
+    // Optionally include short break
+    if (includeShortBreak) {
+        const shortBreakStartTime = calculateShortBreakStartTime(collegeStartTime);
+        const shortBreakEndTime = addMinutesToTime(shortBreakStartTime, shortBreakDuration);
+        breakSlots[`${shortBreakStartTime}-${shortBreakEndTime}`] = 'Short Break';
+    }
+    
+    console.log('Generating timetable grid with schedule:', scheduleData);
+    
+    // Create timetable grid
+    const timetableGrid = {};
+    
+    // Initialize grid with empty slots
+    days.forEach(day => {
+        timetableGrid[day] = {};
+        timeSlots.forEach(slot => {
+            timetableGrid[day][slot] = null;
+        });
+    });
+    
+    // Populate grid with schedule data
+    if (scheduleData && Array.isArray(scheduleData)) {
+        console.log(`Processing ${scheduleData.length} schedule entries`);
+        scheduleData.forEach((entry, index) => {
+            console.log(`Entry ${index}:`, entry);
+            
+            // Use the day field directly from the formatted schedule
+            const day = entry.day;
+            const timeSlot = entry.time_slot;
+            
+            if (day && timeSlot && days.includes(day) && timeSlots.includes(timeSlot)) {
+                timetableGrid[day][timeSlot] = entry;
+                console.log(`Placed entry at ${day} ${timeSlot}:`, entry.subject_name);
+            } else {
+                console.warn(`Invalid day/time slot for entry:`, { day, timeSlot, entry });
+            }
+        });
+    } else {
+        console.warn('No valid schedule data provided:', scheduleData);
+    }
+    
+    // Build HTML table structure with days as rows and time slots as columns
+    let html = `
+        <div class="table-responsive">
+            <table class="table table-bordered timetable-grid">
+                <thead class="table-dark">
+                    <tr>
+                        <th style="width: 100px;">Day</th>
+                        ${timeSlots.map(slot => `<th class="text-center" style="min-width: 150px;">${convertTimeSlotTo12Hour(slot)}</th>`).join('')}
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+    
+    // Build timetable with days as rows
+    days.forEach(day => {
+        html += `<tr><td class="fw-bold text-center day-header">${day}</td>`;
+        
+        timeSlots.forEach(slot => {
+            // Check if this slot is a break slot
+            if (breakSlots[slot]) {
+                const icon = breakSlots[slot].includes('Lunch') ? 'fas fa-utensils text-success' : 'fas fa-coffee text-warning';
+                html += `<td class="break-cell text-center"><i class="${icon}"></i> ${breakSlots[slot]}</td>`;
+            } else {
+                const entry = timetableGrid[day][slot];
+                if (entry) {
+                    const cellClass = entry.is_fixed ? 'timetable-cell fixed-slot' : 'timetable-cell';
+                    html += `
+                        <td class="${cellClass}">
+                            <div class="subject-info">
+                                <strong>${entry.subject_name || 'Unknown Subject'}</strong><br>
+                                <small class="text-muted">${entry.subject_code || 'N/A'}</small>
+                            </div>
+                            <div class="faculty-info mt-1">
+                                <i class="fas fa-user text-primary"></i> ${entry.faculty_name || 'Unknown Faculty'}
+                            </div>
+                            <div class="classroom-info">
+                                <i class="fas fa-door-open text-success"></i> ${entry.classroom_name || 'Unknown Room'}
+                            </div>
+                            ${entry.is_fixed ? '<div class="fixed-indicator"><i class="fas fa-lock text-warning"></i> Fixed</div>' : ''}
+                        </td>
+                    `;
+                } else {
+                    html += `<td class="timetable-cell empty-slot text-center text-muted">Free</td>`;
+                }
+            }
+        });
+        
+        html += '</tr>';
+    });
+    
+    html += `
+                </tbody>
+            </table>
+        </div>
+    `;
+    
+    return html;
+}
+
+// Helper functions for dynamic time slot generation
+function generateTimeSlots(startTime, endTime, lunchBreakDuration, lunchBreakStartTime = null) {
+    const slots = [];
+    let currentTime = startTime;
+    const endTimeMinutes = timeToMinutes(endTime);
+    const lunchStartTime = lunchBreakStartTime || calculateLunchStartTime(startTime, endTime);
+    const lunchEndTime = addMinutesToTime(lunchStartTime, lunchBreakDuration);
+    
+    while (timeToMinutes(currentTime) < endTimeMinutes) {
+        const slotEndTime = addMinutesToTime(currentTime, 45);
+        const slot = `${currentTime}-${slotEndTime}`;
+        
+        // Skip lunch break period
+        if (currentTime !== lunchStartTime) {
+            slots.push(slot);
+        }
+        
+        // Jump over lunch break
+        if (currentTime === lunchStartTime) {
+            currentTime = lunchEndTime;
+        } else {
+            currentTime = slotEndTime;
+        }
+        
+        // Break if we've reached the end time
+        if (timeToMinutes(currentTime) >= endTimeMinutes) break;
+    }
+    
+    return slots;
+}
+
+function generateFullSchedule(startTime, endTime, includeShortBreak, shortBreakDuration, lunchBreakDuration, lunchBreakStartTime = null) {
+    const timeSchedule = [];
+    let currentTime = startTime;
+    const endTimeMinutes = timeToMinutes(endTime);
+    const lunchStartTime = lunchBreakStartTime || calculateLunchStartTime(startTime, endTime);
+    const lunchEndTime = addMinutesToTime(lunchStartTime, lunchBreakDuration);
+    
+    while (timeToMinutes(currentTime) < endTimeMinutes) {
+        // Add short break if enabled and at the right time
+        if (includeShortBreak && shouldAddShortBreak(currentTime, startTime)) {
+            const shortBreakEndTime = addMinutesToTime(currentTime, shortBreakDuration);
+            timeSchedule.push(`${currentTime}-${shortBreakEndTime}`);
+            currentTime = shortBreakEndTime;
+            continue;
+        }
+        
+        // Add lunch break
+        if (currentTime === lunchStartTime) {
+            timeSchedule.push(`${lunchStartTime}-${lunchEndTime}`);
+            currentTime = lunchEndTime;
+            continue;
+        }
+        
+        // Add regular class slot
+        const slotEndTime = addMinutesToTime(currentTime, 45);
+        timeSchedule.push(`${currentTime}-${slotEndTime}`);
+        currentTime = slotEndTime;
+        
+        // Break if we've reached the end time
+        if (timeToMinutes(currentTime) >= endTimeMinutes) break;
+    }
+    
+    return timeSchedule;
+}
+
+function calculateLunchStartTime(startTime, endTime) {
+    const startMinutes = timeToMinutes(startTime);
+    const endMinutes = timeToMinutes(endTime);
+    const totalMinutes = endMinutes - startMinutes;
+    const lunchStartMinutes = startMinutes + Math.floor(totalMinutes / 2);
+    
+    // Round to nearest 15-minute interval
+    const rounded = Math.round(lunchStartMinutes / 15) * 15;
+    return minutesToTime(rounded);
+}
+
+function calculateShortBreakStartTime(startTime) {
+    const startMinutes = timeToMinutes(startTime);
+    // Add approximately 1.5 hours for short break
+    const breakMinutes = startMinutes + 90;
+    return minutesToTime(breakMinutes);
+}
+
+function shouldAddShortBreak(currentTime, startTime) {
+    const shortBreakTime = calculateShortBreakStartTime(startTime);
+    return currentTime === shortBreakTime;
+}
+
+function addMinutesToTime(timeStr, minutes) {
+    const totalMinutes = timeToMinutes(timeStr) + minutes;
+    return minutesToTime(totalMinutes);
+}
+
+function timeToMinutes(timeStr) {
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    return hours * 60 + minutes;
+}
+
+function minutesToTime(totalMinutes) {
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+}
+</script>
+
+<style>
+    .timetable-grid th, .timetable-grid td {
+        text-align: center;
+        vertical-align: middle;
+        padding: 8px;
+    }
+    
+    .timetable-cell {
+        min-height: 80px;
+        position: relative;
+        padding: 10px !important;
+    }
+    
+    .timetable-cell:not(.empty-slot) {
+        background-color: #f8f9fa;
+        border-left: 4px solid #007bff;
+    }
+    
+    .timetable-cell.fixed-slot {
+        background-color: #fff3cd;
+        border-left-color: #ffc107;
+    }
+    
+    .empty-slot {
+        background-color: #ffffff;
+        color: #6c757d;
+        font-style: italic;
+        font-weight: 500;
+    }
+    
+    .subject-info {
+        margin-bottom: 5px;
+    }
+    
+    .subject-info small {
+        color: #6c757d;
+        font-size: 0.8rem;
+    }
+    
+    .time-slot {
+        font-weight: bold;
+        color: #495057;
+        font-size: 0.85rem;
+    }
+    
+    .btn-option {
+        margin: 5px;
+        min-width: 120px;
+    }
+    
+    .loading-spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #007bff;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 20px auto;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    /* Auto-populated field animation */
+    .auto-populated {
+        background: linear-gradient(45deg, #e3f2fd, #bbdefb);
+        border-color: #2196f3;
+        box-shadow: 0 0 10px rgba(33, 150, 243, 0.3);
+        transition: all 0.5s ease;
+    }
+    
+    .auto-populated::after {
+        content: "✓ Auto-filled";
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #2196f3;
+        font-size: 0.8rem;
+        font-weight: bold;
+        animation: fadeInOut 2s ease;
+    }
+    
+    @keyframes fadeInOut {
+        0% { opacity: 0; transform: translateY(-50%) translateX(10px); }
+        50% { opacity: 1; transform: translateY(-50%) translateX(0); }
+        100% { opacity: 0; transform: translateY(-50%) translateX(-10px); }
+    }
+    
+    /* Enhanced form styling */
+    .form-control, .form-select {
+        position: relative;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+    
+    .break-row {
+        background-color: #f8f9fa;
+    }
+    
+    .break-time {
+        background-color: #e9ecef !important;
+        color: #495057;
+        font-weight: 600;
+    }
+    
+    .break-cell {
+        background-color: #fff3cd !important;
+        color: #856404;
+        font-weight: 500;
+        border-left: 4px solid #ffc107 !important;
+    }
+</style>
+{% endblock %}

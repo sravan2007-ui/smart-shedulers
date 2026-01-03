@@ -1,0 +1,644 @@
+/* 
+ * ZERO-GRAVITY UI - REGISTER THEME
+ * Google-Antigravity style physics interface.
+ * Chaotic, Fun, Interactive, Memorable.
+ */
+
+:root {
+    --bg-space-dark: #000000;
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255, 255, 255, 0.7);
+    --accent-neon: #00ffff;
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+}
+
+.register-page-container {
+    margin: 0;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: var(--text-primary);
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+}
+
+/* Physics Container */
+.register-page-container .ultra-modern-login-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* 
+ * Floating Elements (Physics Bodies)
+ * All elements with .zero-g-element are handled by JS physics.
+ * Initial styling sets their size and appearance.
+ */
+
+.register-page-container .zero-g-element {
+    position: absolute;
+    will-change: transform;
+    /* user-select: none; handled by JS */
+}
+
+/* Login Card - The Mothership */
+.register-page-container .login-form-container {
+    /* Centered initially, but physics will take over */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    /* Initial only, JS overwrites */
+    width: 100%;
+    max-width: 420px;
+    z-index: 100;
+}
+
+.register-page-container .login-card:not(.glass-card) {
+    background: rgba(20, 20, 20, 0.6);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    cursor: grab;
+    /* Indicating interactions */
+}
+
+.register-page-container .login-card:active {
+    cursor: grabbing;
+}
+
+/* Debris - Floating Icons */
+.register-page-container .debris {
+    font-size: 2rem;
+    color: rgba(255, 255, 255, 0.3);
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    width: 80px;
+    /* Explicit size for physics */
+    height: 80px;
+    cursor: grab;
+    pointer-events: none;
+    animation: debrisFloat 6s ease-in-out infinite alternate;
+}
+
+.register-page-container .debris:active {
+    cursor: grabbing;
+    background: rgba(0, 255, 255, 0.2);
+    color: #fff;
+    border-color: #00ffff;
+    box-shadow: 0 0 20px #00ffff;
+}
+
+/* Varied Debris Styles */
+.register-page-container .debris-1 {
+    font-size: 3rem;
+    width: 100px;
+    height: 100px;
+    color: #ff6b6b;
+    top: 10%;
+    left: 8%;
+    animation-duration: 7s;
+}
+
+.register-page-container .debris-2 {
+    font-size: 2.5rem;
+    width: 90px;
+    height: 90px;
+    color: #4ecdc4;
+    top: 15%;
+    right: 10%;
+    animation-duration: 8s;
+}
+
+.register-page-container .debris-3 {
+    font-size: 2rem;
+    width: 70px;
+    height: 70px;
+    color: #ffe66d;
+    bottom: 18%;
+    left: 12%;
+    animation-duration: 6.5s;
+}
+
+.register-page-container .debris-4 {
+    font-size: 3.5rem;
+    width: 110px;
+    height: 110px;
+    color: #1a535c;
+    top: 55%;
+    left: 4%;
+    animation-duration: 9s;
+}
+
+.register-page-container .debris-5 {
+    font-size: 2.2rem;
+    width: 80px;
+    height: 80px;
+    color: #ff9f1c;
+    bottom: 10%;
+    right: 12%;
+    animation-duration: 7.5s;
+}
+
+.register-page-container .debris-6 {
+    font-size: 1.8rem;
+    width: 60px;
+    height: 60px;
+    color: #2ec4b6;
+    top: 35%;
+    right: 6%;
+    animation-duration: 6.8s;
+}
+
+.register-page-container .debris-7 {
+    font-size: 2.8rem;
+    width: 95px;
+    height: 95px;
+    color: #e71d36;
+    bottom: 28%;
+    right: 20%;
+    animation-duration: 8.5s;
+}
+
+.register-page-container .debris-8 {
+    font-size: 2rem;
+    width: 75px;
+    height: 75px;
+    color: #ff006e;
+    top: 8%;
+    left: 45%;
+    animation-duration: 7.2s;
+}
+
+@keyframes debrisFloat {
+    0% {
+        transform: translate3d(0, 0, 0);
+    }
+
+    100% {
+        transform: translate3d(0, -18px, 0);
+    }
+}
+
+/* 
+ * Form Elements 
+ * Must remain usable even while floating/rotating.
+ */
+.register-page-container .login-header h1 {
+    font-size: 2rem;
+    margin: 0 0 10px 0;
+    color: #fff;
+}
+
+.register-page-container .login-header p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.register-page-container .input-group {
+    margin-bottom: 20px;
+    position: relative;
+    /* Prevent input clicks from triggering Drag */
+}
+
+/* Stop drag propagation on inputs so user can type */
+.register-page-container .input-wrapper input:not(.input-field) {
+    width: 100%;
+    padding: 12px 15px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    font-size: 1rem;
+    color: #fff;
+    pointer-events: auto;
+    /* Ensure clickable */
+}
+
+.register-page-container .input-wrapper input:not(.input-field):focus {
+    outline: none;
+    border-color: var(--accent-neon);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+}
+
+.register-page-container .input-wrapper label:not(.input-label) {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+    pointer-events: none;
+    transition: 0.3s;
+}
+
+.register-page-container .input-wrapper input:not(.input-field):focus+label,
+.register-page-container .input-wrapper input:not(.input-field):not(:placeholder-shown)+label {
+    top: -10px;
+    left: 10px;
+    font-size: 0.8rem;
+    color: var(--accent-neon);
+    background: #000;
+    padding: 0 5px;
+}
+
+.login-button {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(45deg, #00ffff, #00ccff);
+    border: none;
+    border-radius: 8px;
+    color: #000;
+    font-weight: bold;
+    font-size: 1.1rem;
+    cursor: pointer;
+    margin-top: 10px;
+    pointer-events: auto;
+}
+
+.login-button:hover {
+    box-shadow: 0 0 20px #00ffff;
+    transform: scale(1.02);
+}
+
+.register-page-container .auth-links {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.register-page-container .register-link {
+    color: var(--accent-neon);
+    text-decoration: none;
+}
+
+.register-page-container .password-strength-meter {
+    width: 100%;
+    height: 6px;
+    margin-top: 10px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+}
+
+.register-page-container .password-strength-bar {
+    height: 100%;
+    width: 0%;
+    border-radius: 999px;
+    transition: width 180ms ease, background-color 180ms ease;
+    background: rgba(239, 68, 68, 0.75);
+}
+
+.register-page-container .password-strength-bar.weak {
+    background: rgba(239, 68, 68, 0.8);
+}
+
+.register-page-container .password-strength-bar.medium {
+    background: rgba(245, 158, 11, 0.85);
+}
+
+.register-page-container .password-strength-bar.strong {
+    background: rgba(34, 197, 94, 0.85);
+}
+
+.register-page-container .password-strength-text {
+    margin-top: 6px;
+    font-size: 0.85rem;
+    line-height: 1.1;
+    min-height: 1em;
+    color: rgba(255, 255, 255, 0.7);
+    text-align: left;
+}
+
+.register-page-container .password-strength-text.weak {
+color: rgba(239, 68, 68, 0.95);
+}
+
+.register-page-container .password-strength-text.medium {
+color: rgba(245, 158, 11, 0.95);
+}
+
+.register-page-container .password-strength-text.strong {
+    color: rgba(34, 197, 94, 0.95);
+}
+
+/* Override futuristic-login input transitions for register page to be even faster */
+.register-page-container .input-field {
+    transition: border-color 0.12s ease, box-shadow 0.12s ease;
+    will-change: border-color, box-shadow;
+    contain: layout style paint;
+}
+
+.register-page-container .input-field:focus {
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
+}
+
+.register-page-container .input-label {
+    transition: transform 0.12s ease, color 0.12s ease;
+    will-change: transform, color;
+    contain: layout style paint;
+}
+
+.register-page-container .password-match-feedback {
+margin-top: 6px;
+font-size: 0.85rem;
+line-height: 1.1;
+min-height: 1em;
+text-align: left;
+opacity: 0;
+transform: translateY(-4px);
+transition: opacity 180ms ease, transform 180ms ease;
+    min-height: 1em;
+    text-align: left;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.register-page-container .password-match-feedback:not(:empty) {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.register-page-container .password-match-feedback.match {
+    color: rgba(34, 197, 94, 0.95);
+}
+
+.register-page-container .password-match-feedback.mismatch {
+    color: rgba(239, 68, 68, 0.95);
+}
+
+.register-page-container .register-toast {
+    position: fixed;
+    left: 50%;
+    bottom: 28px;
+    transform: translateX(-50%) translateY(16px);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 11000;
+    padding: 12px 14px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    line-height: 1.2;
+    color: #fff;
+    background: rgba(239, 68, 68, 0.92);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    max-width: min(520px, calc(100vw - 32px));
+}
+
+.register-page-container .register-toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+    animation: registerToastPop 260ms ease-out;
+}
+
+.register-page-container .register-toast.success {
+    background: rgba(34, 197, 94, 0.92);
+}
+
+.register-page-container .register-toast.warning {
+    background: rgba(245, 158, 11, 0.92);
+}
+
+.register-page-container .register-toast.info {
+    background: rgba(59, 130, 246, 0.92);
+}
+
+@keyframes registerToastPop {
+    0% {
+        transform: translateX(-50%) translateY(16px) scale(0.98);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateX(-50%) translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+.register-page-container .input-field.field-error {
+    border-color: rgba(239, 68, 68, 0.9);
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15);
+    animation: registerFieldShake 260ms ease-in-out;
+}
+
+@keyframes registerFieldShake {
+    0% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-4px);
+    }
+
+    75% {
+        transform: translateX(4px);
+    }
+
+    100% {
+        transform: translateX(0);
+    }
+}
+/* Adjusted Register Form Styles */
+.login-form-container {
+    max-height: 85vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 10px;
+}
+
+/* Custom Scrollbar */
+.login-form-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.login-form-container::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.login-form-container::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 255, 0.3);
+    border-radius: 10px;
+}
+
+.login-form-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 255, 255, 0.5);
+}
+
+/* Compact Password Requirements */
+.password-requirements {
+    margin-top: 8px;
+    padding: 10px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+}
+
+.requirement {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.6);
+    transition: all 0.3s ease;
+}
+
+.requirement i {
+    font-size: 8px;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.requirement span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.requirement.met {
+    color: #4cd964;
+}
+
+.requirement.met i {
+    color: #4cd964;
+}
+
+.requirement.met i.fa-circle::before {
+    content: "\f058";
+    font-size: 10px;
+}
+
+/* Compact Input Groups */
+.input-group {
+    margin-bottom: 16px;
+}
+
+/* Reduce padding on card */
+.login-card {
+    padding: 24px;
+    max-width: 480px;
+}
+
+/* Adjust header spacing */
+.login-header {
+    margin-bottom: 20px;
+}
+
+.login-header h1 {
+    font-size: 1.8rem;
+    margin-bottom: 6px;
+}
+
+.login-header p {
+    font-size: 0.9rem;
+}
+
+/* More compact password strength */
+.password-strength-meter {
+    height: 3px;
+    margin-top: 6px;
+}
+
+.password-strength-text {
+    font-size: 0.75rem;
+    margin-top: 4px;
+}
+
+/* Compact role selection */
+.role-label {
+    padding: 12px 10px;
+}
+
+.role-label i {
+    font-size: 1.3rem;
+    margin-bottom: 6px;
+}
+
+.role-label span {
+    font-size: 0.85rem;
+}
+
+.role-label small {
+    font-size: 0.7rem;
+}
+
+/* Compact checkboxes */
+.checkbox-wrapper {
+    margin: 8px 0;
+}
+
+.checkbox-label {
+    font-size: 0.8rem;
+}
+
+/* Compact social section */
+.social-divider {
+    margin: 16px 0;
+}
+
+.social-auth {
+    margin: 12px 0;
+}
+
+.social-btn {
+    padding: 12px;
+    font-size: 0.9rem;
+}
+
+/* Compact security notice */
+.security-notice {
+    margin-top: 16px;
+    padding: 10px;
+    font-size: 0.75rem;
+}
+
+/* Field hints smaller */
+.field-hint {
+    font-size: 0.7rem;
+    margin-top: 3px;
+}
+
+.field-validation {
+    font-size: 0.7rem;
+    margin-top: 3px;
+}
+
+/* Submit button */
+.submit-btn {
+    margin-top: 16px;
+    margin-bottom: 12px;
+}
+
+/* Auth links */
+.auth-links {
+    margin-top: 12px;
+    font-size: 0.85rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .login-card {
+        padding: 20px;
+    }
+    
+    .password-requirements {
+        grid-template-columns: 1fr;
+    }
+    
+    .login-form-container {
+        max-height: 90vh;
+    }
+}

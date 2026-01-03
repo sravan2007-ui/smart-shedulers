@@ -1,0 +1,814 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Timetables - Smart Classroom Scheduler{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1><i class="fas fa-table me-2"></i>Manage Timetables</h1>
+            <a href="{{ url_for('timetable_generator') }}" class="btn btn-primary">
+                <i class="fas fa-magic me-2"></i>Generate New Timetable
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped" id="timetablesTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Batch</th>
+                                <th>Semester</th>
+                                <th>Academic Year</th>
+                                <th>Status</th>
+                                <th>Created By</th>
+                                <th>Created At</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data will be loaded via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- View Timetable Modal -->
+<div class="modal fade" id="viewTimetableModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">View Timetable</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="mb-0">Timetable Details</h6>
+                    <button type="button" class="btn btn-success btn-sm" onclick="downloadTimetablePDF()" id="downloadPDFBtn" style="display: none;">
+                        <i class="fas fa-download me-1"></i>Download PDF
+                    </button>
+                </div>
+                <div id="timetableView">
+                    <!-- Timetable will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Timetable Modal -->
+<div class="modal fade" id="editTimetableModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Timetable</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editTimetableForm">
+                    <input type="hidden" id="editTimetableId">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="editTimetableName" class="form-label">Timetable Name</label>
+                                <input type="text" class="form-control" id="editTimetableName" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="editTimetableStatus" class="form-label">Status</label>
+                                <select class="form-select" id="editTimetableStatus">
+                                    <option value="active">Active</option>
+                                    <option value="draft">Draft</option>
+                                    <option value="archived">Archived</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="editTimetableSemester" class="form-label">Semester</label>
+                                <input type="number" class="form-control" id="editTimetableSemester" min="1" max="8" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="editTimetableYear" class="form-label">Academic Year</label>
+                                <input type="text" class="form-control" id="editTimetableYear" placeholder="e.g., 2023-24" required>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="updateTimetable()">Update Timetable</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+$(document).ready(function() {
+    console.log('Document ready, jQuery version:', $.fn.jquery);
+    console.log('Current URL:', window.location.href);
+    loadTimetables();
+});
+
+function loadTimetables() {
+    console.log('Loading timetables...');
+    
+    // Add loading indicator
+    const tbody = $('#timetablesTable tbody');
+    tbody.html(`
+        <tr>
+            <td colspan="6" class="text-center">
+                <i class="fas fa-spinner fa-spin fa-2x mb-2"></i><br>
+                Loading timetables...
+            </td>
+        </tr>
+    `);
+    
+    $.get('/api/timetables', function(data) {
+        if (data.success && data.timetables) {
+            currentData = data.timetables;
+            renderTimetables(data.timetables);
+        } else {
+            showAlert('Error loading timetables!', 'danger');
+        }
+    }).fail(function(xhr, status, error) {
+        console.error('Error loading timetables:', error);
+        showAlert('Error loading timetables!', 'danger');
+    });
+}
+
+function renderTimetables(timetables) {
+    const tbody = $('#timetablesTable tbody');
+    tbody.empty();
+    
+    if (timetables.length === 0) {
+        tbody.append('<tr><td colspan="6" class="text-center">No timetables found. <a href="/timetable-generator">Generate your first timetable</a></td></tr>');
+        return;
+    }
+    
+    timetables.forEach(function(timetable) {
+        const row = `
+            <tr>
+                <td>${timetable.name}</td>
+                <td>${timetable.batch_name || 'N/A'}</td>
+                <td>${timetable.semester}</td>
+                <td>${timetable.academic_year}</td>
+                <td><span class="badge bg-${getStatusColor(timetable.status || 'active')}">${capitalizeFirst(timetable.status || 'active')}</span></td>
+                <td>
+                    <button class="btn btn-sm btn-outline-primary me-1" onclick="viewTimetable(${timetable.id})" title="View">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-warning me-1" onclick="editTimetable(${timetable.id})" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteTimetable(${timetable.id})" title="Delete">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+        tbody.append(row);
+    });
+}
+
+function getStatusColor(status) {
+    switch(status.toLowerCase()) {
+        case 'active': return 'success';
+        case 'draft': return 'warning';
+        case 'archived': return 'secondary';
+        default: return 'primary';
+    }
+}
+
+function capitalizeFirst(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+let currentTimetableId = null;
+
+function viewTimetable(id) {
+    currentTimetableId = id;
+    $.ajax({
+        url: `/api/timetables/${id}`,
+        method: 'GET',
+        success: function(response) {
+            if (response.success) {
+                // Show the PDF download button
+                $('#downloadPDFBtn').show();
+                const timetable = response.timetable;
+                
+                // Store timetable data globally for use in generateTimetableGrid
+                window.currentTimetableData = timetable;
+                
+                $('#viewTimetableModal .modal-title').text(`View Timetable - ${timetable.name}`);
+                
+                // Generate timetable grid
+                const timetableHtml = generateTimetableGrid(timetable.schedule);
+                $('#timetableView').html(timetableHtml);
+                
+                $('#viewTimetableModal').modal('show');
+            } else {
+                showAlert('Error loading timetable!', 'danger');
+            }
+        },
+        error: function() {
+            showAlert('Error loading timetable!', 'danger');
+        }
+    });
+}
+
+function editTimetable(id) {
+    $.ajax({
+        url: `/api/timetables/${id}`,
+        method: 'GET',
+        success: function(response) {
+            if (response.success && response.timetable) {
+                const timetable = response.timetable;
+                
+                // Populate form fields
+                $('#editTimetableId').val(timetable.id);
+                $('#editTimetableName').val(timetable.name);
+                $('#editTimetableStatus').val(timetable.status || 'active');
+                $('#editTimetableSemester').val(timetable.semester);
+                $('#editTimetableYear').val(timetable.academic_year);
+                
+                // Show modal
+                $('#editTimetableModal').modal('show');
+            } else {
+                showAlert('Error loading timetable details!', 'danger');
+            }
+        },
+        error: function() {
+            showAlert('Error loading timetable details!', 'danger');
+        }
+    });
+}
+
+function updateTimetable() {
+    const id = $('#editTimetableId').val();
+    const formData = {
+        name: $('#editTimetableName').val(),
+        status: $('#editTimetableStatus').val(),
+        semester: parseInt($('#editTimetableSemester').val()),
+        academic_year: $('#editTimetableYear').val()
+    };
+    
+    // Validate form
+    if (!formData.name || !formData.semester || !formData.academic_year) {
+        showAlert('Please fill in all required fields!', 'warning');
+        return;
+    }
+    
+    $.ajax({
+        url: `/api/timetables/${id}`,
+        method: 'PUT',
+        contentType: 'application/json',
+        data: JSON.stringify(formData),
+        success: function(response) {
+            if (response.success) {
+                showAlert(response.message, 'success');
+                $('#editTimetableModal').modal('hide');
+                loadTimetables();
+            } else {
+                showAlert(response.error || 'Error updating timetable!', 'danger');
+            }
+        },
+        error: function(xhr) {
+            let errorMessage = 'Server error. Please try again later.';
+            if (xhr.responseJSON && xhr.responseJSON.error) {
+                errorMessage = xhr.responseJSON.error;
+            }
+            showAlert(errorMessage, 'danger');
+        }
+    });
+}
+
+function deleteTimetable(id) {
+    // Create a proper modal for delete confirmation
+    const modalHtml = `
+        <div class="modal fade" id="deleteTimetableModal" tabindex="-1" aria-labelledby="deleteTimetableModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteTimetableModalLabel">
+                            <i class="fas fa-exclamation-triangle text-warning me-2"></i>Confirm Delete
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to delete this timetable?</p>
+                        <p class="text-muted">This action cannot be undone.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-danger" onclick="confirmDeleteTimetable(${id})">
+                            <i class="fas fa-trash me-1"></i>Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Remove existing modal if any
+    $('#deleteTimetableModal').remove();
+    
+    // Add modal to body and show with proper initialization
+    $('body').append(modalHtml);
+    
+    // Initialize and show modal with proper centering
+    const modal = new bootstrap.Modal(document.getElementById('deleteTimetableModal'), {
+        backdrop: 'static',
+        keyboard: false
+    });
+    modal.show();
+}
+
+function confirmDeleteTimetable(id) {
+    // Hide modal using Bootstrap 5 method
+    const modal = bootstrap.Modal.getInstance(document.getElementById('deleteTimetableModal'));
+    modal.hide();
+    $.ajax({
+        url: `/api/timetables/${id}`,
+        method: 'DELETE',
+        success: function(response) {
+            if (response.success) {
+                showAlert(response.message, 'success');
+                loadTimetables();
+            } else {
+                showAlert('Error deleting timetable!', 'danger');
+            }
+        },
+        error: function() {
+            showAlert('Error deleting timetable!', 'danger');
+        }
+    });
+}
+
+// Helper function to convert 24-hour time to 12-hour format
+function convertTo12Hour(time24) {
+    const [hours, minutes] = time24.split(':');
+    const hour = parseInt(hours);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const hour12 = hour % 12 || 12;
+    return `${hour12}:${minutes} ${ampm}`;
+}
+
+// Helper function to convert time slot to 12-hour format
+function convertTimeSlotTo12Hour(timeSlot) {
+    if (timeSlot.includes('-')) {
+        const [startTime, endTime] = timeSlot.split('-');
+        return `${convertTo12Hour(startTime)} - ${convertTo12Hour(endTime)}`;
+    }
+    return timeSlot;
+}
+
+// Helper functions for time calculations
+function addMinutesToTime(timeStr, minutes) {
+    const totalMinutes = timeToMinutes(timeStr) + minutes;
+    return minutesToTime(totalMinutes);
+}
+
+function timeToMinutes(timeStr) {
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    return hours * 60 + minutes;
+}
+
+function minutesToTime(totalMinutes) {
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+}
+
+function calculateShortBreakStartTime(startTime) {
+    const startMinutes = timeToMinutes(startTime);
+    // Add approximately 1.5 hours for short break
+    const breakMinutes = startMinutes + 90;
+    return minutesToTime(breakMinutes);
+}
+
+function shouldAddShortBreak(currentTime, startTime) {
+    const shortBreakTime = calculateShortBreakStartTime(startTime);
+    return currentTime === shortBreakTime;
+}
+
+function generateFullSchedule(startTime, endTime, includeShortBreak, shortBreakDuration, lunchBreakDuration, lunchBreakStartTime = null) {
+    const timeSchedule = [];
+    let currentTime = startTime;
+    const endTimeMinutes = timeToMinutes(endTime);
+    const lunchStartTime = lunchBreakStartTime || calculateLunchStartTime(startTime, endTime);
+    const lunchEndTime = addMinutesToTime(lunchStartTime, lunchBreakDuration);
+    
+    while (timeToMinutes(currentTime) < endTimeMinutes) {
+        // Add short break if enabled and at the right time
+        if (includeShortBreak && shouldAddShortBreak(currentTime, startTime)) {
+            const shortBreakEndTime = addMinutesToTime(currentTime, shortBreakDuration);
+            timeSchedule.push(`${currentTime}-${shortBreakEndTime}`);
+            currentTime = shortBreakEndTime;
+            continue;
+        }
+        
+        // Add lunch break
+        if (currentTime === lunchStartTime) {
+            timeSchedule.push(`${lunchStartTime}-${lunchEndTime}`);
+            currentTime = lunchEndTime;
+            continue;
+        }
+        
+        // Add regular class slot
+        const slotEndTime = addMinutesToTime(currentTime, 45);
+        timeSchedule.push(`${currentTime}-${slotEndTime}`);
+        currentTime = slotEndTime;
+        
+        // Break if we've reached the end time
+        if (timeToMinutes(currentTime) >= endTimeMinutes) break;
+    }
+    
+    return timeSchedule;
+}
+
+function calculateLunchStartTime(startTime, endTime) {
+    const startMinutes = timeToMinutes(startTime);
+    const endMinutes = timeToMinutes(endTime);
+    const totalMinutes = endMinutes - startMinutes;
+    const lunchStartMinutes = startMinutes + Math.floor(totalMinutes / 2);
+    
+    // Round to nearest 15-minute interval
+    const rounded = Math.round(lunchStartMinutes / 15) * 15;
+    return minutesToTime(rounded);
+}
+
+function generateTimetableGrid(schedule) {
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    
+    // Use dynamic time slots - extract from the first schedule entry or use defaults
+    let collegeStartTime = '09:00';
+    let collegeEndTime = '16:30';
+    let lunchBreakDuration = 60;
+    let lunchBreakStartTime = '12:15';
+    let includeShortBreak = false;
+    let shortBreakDuration = 10;
+    
+    // Try to extract timing info from timetable data if available
+    if (window.currentTimetableData && window.currentTimetableData.timing_config) {
+        const config = window.currentTimetableData.timing_config;
+        collegeStartTime = config.college_start_time || '09:00';
+        collegeEndTime = config.college_end_time || '16:30';
+        lunchBreakDuration = config.lunch_break_duration || 60;
+        lunchBreakStartTime = config.lunch_break_start_time || '12:15';
+        includeShortBreak = config.include_short_break || false;
+        shortBreakDuration = config.short_break_duration || 10;
+    } else if (schedule && schedule.length > 0 && schedule[0].metadata) {
+        const meta = schedule[0].metadata;
+        collegeStartTime = meta.college_start_time || '09:00';
+        collegeEndTime = meta.college_end_time || '16:30';
+        lunchBreakDuration = meta.lunch_break_duration || 60;
+        lunchBreakStartTime = meta.lunch_break_start_time || '12:15';
+        includeShortBreak = meta.include_short_break || false;
+        shortBreakDuration = meta.short_break_duration || 10;
+    }
+    
+    // Generate dynamic time slots (including breaks)
+    const timeSlots = generateFullSchedule(collegeStartTime, collegeEndTime, includeShortBreak, shortBreakDuration, lunchBreakDuration, lunchBreakStartTime);
+    
+    // Dynamic break slots
+    const breakSlots = {};
+    const lunchEndTime = addMinutesToTime(lunchBreakStartTime, lunchBreakDuration);
+    breakSlots[`${lunchBreakStartTime}-${lunchEndTime}`] = 'Lunch Break';
+    
+    if (includeShortBreak) {
+        const shortBreakStartTime = calculateShortBreakStartTime(collegeStartTime);
+        const shortBreakEndTime = addMinutesToTime(shortBreakStartTime, shortBreakDuration);
+        breakSlots[`${shortBreakStartTime}-${shortBreakEndTime}`] = 'Short Break';
+    }
+    
+    console.log('Generating timetable grid with schedule:', schedule);
+    console.log('Using time slots:', timeSlots);
+    console.log('Using break slots:', breakSlots);
+    
+    // Create timetable grid
+    const timetableGrid = {};
+    
+    // Initialize grid with empty slots
+    days.forEach(day => {
+        timetableGrid[day] = {};
+        timeSlots.forEach(slot => {
+            timetableGrid[day][slot] = null;
+        });
+    });
+    
+    // Populate grid with schedule data
+    if (schedule && Array.isArray(schedule)) {
+        console.log(`Processing ${schedule.length} schedule entries`);
+        schedule.forEach((entry, index) => {
+            console.log(`Entry ${index}:`, entry);
+            
+            // Use the day field directly from the formatted schedule
+            const day = entry.day;
+            const timeSlot = entry.time_slot;
+            
+            if (day && timeSlot && days.includes(day) && timeSlots.includes(timeSlot)) {
+                timetableGrid[day][timeSlot] = entry;
+                console.log(`Placed entry at ${day} ${timeSlot}:`, entry.subject_name);
+            } else {
+                console.warn(`Invalid day/time slot for entry:`, { day, timeSlot, entry });
+            }
+        });
+    } else {
+        console.warn('No valid schedule data provided:', schedule);
+    }
+    
+    let html = `
+        <div class="table-responsive">
+            <table class="table table-bordered timetable-grid">
+                <thead class="table-primary">
+                    <tr>
+                        <th class="text-center" style="width: 100px;">Day</th>
+                        ${timeSlots.map(slot => `<th class="text-center" style="min-width: 150px;">${convertTimeSlotTo12Hour(slot)}</th>`).join('')}
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+    
+    // Build timetable with days as rows
+    days.forEach(day => {
+        html += `<tr><td class="fw-bold text-center day-header">${day}</td>`;
+        
+        timeSlots.forEach(slot => {
+            // Check if this slot is a break slot
+            if (breakSlots[slot]) {
+                const icon = breakSlots[slot].includes('Lunch') ? 'fas fa-utensils text-success' : 'fas fa-coffee text-warning';
+                html += `<td class="break-cell text-center"><i class="${icon}"></i> ${breakSlots[slot]}</td>`;
+            } else {
+                const entry = timetableGrid[day][slot];
+                if (entry) {
+                    const cellClass = entry.is_fixed ? 'timetable-cell fixed-slot' : 'timetable-cell';
+                    html += `
+                        <td class="${cellClass}">
+                            <div class="subject-info">
+                                <strong>${entry.subject_name || 'Unknown Subject'}</strong><br>
+                                <small class="text-muted">${entry.subject_code || 'N/A'}</small>
+                            </div>
+                            <div class="faculty-info mt-1">
+                                <i class="fas fa-user text-primary"></i> ${entry.faculty_name || 'Unknown Faculty'}
+                            </div>
+                            <div class="classroom-info">
+                                <i class="fas fa-door-open text-success"></i> ${entry.classroom_name || 'Unknown Room'}
+                            </div>
+                            ${entry.is_fixed ? '<div class="fixed-indicator"><i class="fas fa-lock text-warning"></i> Fixed</div>' : ''}
+                        </td>
+                    `;
+                } else {
+                    html += `<td class="timetable-cell empty-slot text-center text-muted">Free</td>`;
+                }
+            }
+        });
+        
+        html += '</tr>';
+    });
+    
+    html += `
+                </tbody>
+            </table>
+        </div>
+    `;
+    
+    return html;
+}
+
+// Helper functions for dynamic time slot generation
+function generateTimeSlots(startTime, endTime, lunchBreakDuration, lunchBreakStartTime = null) {
+    const slots = [];
+    let currentTime = startTime;
+    const endTimeMinutes = timeToMinutes(endTime);
+    const lunchStartTime = lunchBreakStartTime || calculateLunchStartTime(startTime, endTime);
+    const lunchEndTime = addMinutesToTime(lunchStartTime, lunchBreakDuration);
+    
+    while (timeToMinutes(currentTime) < endTimeMinutes) {
+        const slotEndTime = addMinutesToTime(currentTime, 45);
+        const slot = `${currentTime}-${slotEndTime}`;
+        
+        // Skip lunch break period
+        if (currentTime !== lunchStartTime) {
+            slots.push(slot);
+        }
+        
+        // Jump over lunch break
+        if (currentTime === lunchStartTime) {
+            currentTime = lunchEndTime;
+        } else {
+            currentTime = slotEndTime;
+        }
+        
+        // Break if we've reached the end time
+        if (timeToMinutes(currentTime) >= endTimeMinutes) break;
+    }
+    
+    return slots;
+}
+
+function generateFullSchedule(startTime, endTime, includeShortBreak, shortBreakDuration, lunchBreakDuration, lunchBreakStartTime = null) {
+    const timeSchedule = [];
+    let currentTime = startTime;
+    const endTimeMinutes = timeToMinutes(endTime);
+    const lunchStartTime = lunchBreakStartTime || calculateLunchStartTime(startTime, endTime);
+    const lunchEndTime = addMinutesToTime(lunchStartTime, lunchBreakDuration);
+    
+    while (timeToMinutes(currentTime) < endTimeMinutes) {
+        // Add short break if enabled and at the right time
+        if (includeShortBreak && shouldAddShortBreak(currentTime, startTime)) {
+            const shortBreakEndTime = addMinutesToTime(currentTime, shortBreakDuration);
+            timeSchedule.push(`${currentTime}-${shortBreakEndTime}`);
+            currentTime = shortBreakEndTime;
+            continue;
+        }
+        
+        // Add lunch break
+        if (currentTime === lunchStartTime) {
+            timeSchedule.push(`${lunchStartTime}-${lunchEndTime}`);
+            currentTime = lunchEndTime;
+            continue;
+        }
+        
+        // Add regular class slot
+        const slotEndTime = addMinutesToTime(currentTime, 45);
+        timeSchedule.push(`${currentTime}-${slotEndTime}`);
+        currentTime = slotEndTime;
+        
+        // Break if we've reached the end time
+        if (timeToMinutes(currentTime) >= endTimeMinutes) break;
+    }
+    
+    return timeSchedule;
+}
+
+function calculateLunchStartTime(startTime, endTime) {
+    const startMinutes = timeToMinutes(startTime);
+    const endMinutes = timeToMinutes(endTime);
+    const totalMinutes = endMinutes - startMinutes;
+    const lunchStartMinutes = startMinutes + Math.floor(totalMinutes / 2);
+    
+    // Round to nearest 15-minute interval
+    const rounded = Math.round(lunchStartMinutes / 15) * 15;
+    return minutesToTime(rounded);
+}
+
+function calculateShortBreakStartTime(startTime) {
+    const startMinutes = timeToMinutes(startTime);
+    // Add approximately 1.5 hours for short break
+    const breakMinutes = startMinutes + 90;
+    return minutesToTime(breakMinutes);
+}
+
+function shouldAddShortBreak(currentTime, startTime) {
+    const shortBreakTime = calculateShortBreakStartTime(startTime);
+    return currentTime === shortBreakTime;
+}
+
+function addMinutesToTime(timeStr, minutes) {
+    const totalMinutes = timeToMinutes(timeStr) + minutes;
+    return minutesToTime(totalMinutes);
+}
+
+function timeToMinutes(timeStr) {
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    return hours * 60 + minutes;
+}
+
+function minutesToTime(totalMinutes) {
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+}
+</script>
+
+<style>
+    .timetable-grid th, .timetable-grid td {
+        text-align: center;
+        vertical-align: middle;
+        padding: 8px;
+    }
+    
+    .timetable-cell {
+        min-height: 80px;
+        position: relative;
+        padding: 10px !important;
+    }
+    
+    .timetable-cell:not(.empty-slot) {
+        background-color: #f8f9fa;
+        border-left: 4px solid #007bff;
+    }
+    
+    .timetable-cell.fixed-slot {
+        background-color: #fff3cd;
+        border-left-color: #ffc107;
+    }
+    
+    .empty-slot {
+        background-color: #ffffff;
+        color: #6c757d;
+        font-style: italic;
+        font-weight: 500;
+    }
+    
+    .subject-info {
+        margin-bottom: 5px;
+    }
+    
+    .subject-info strong {
+        color: #212529;
+        font-size: 0.9rem;
+    }
+    
+    .subject-info small {
+        font-size: 0.75rem;
+    }
+    
+    .faculty-info, .classroom-info {
+        font-size: 0.8rem;
+        margin-bottom: 2px;
+    }
+    
+    .fixed-indicator {
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        font-size: 0.7rem;
+    }
+    
+    .break-row {
+        background-color: #f8f9fa;
+    }
+    
+    .break-time {
+        background-color: #e9ecef !important;
+        color: #495057;
+        font-weight: 600;
+    }
+    
+    .break-cell {
+        background-color: #fff3cd !important;
+        color: #856404;
+        font-weight: 500;
+        border-left: 4px solid #ffc107 !important;
+    }
+</style>
+
+<script>
+function showAlert(message, type = 'info') {
+    const alertHtml = `
+        <div class="alert alert-${type} alert-dismissible fade show position-fixed" role="alert" style="top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; min-width: 300px; max-width: 500px;">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    `;
+    
+    // Remove any existing alerts
+    $('.alert').remove();
+    
+    // Add new alert at the top center of the page
+    $('body').append(alertHtml);
+    
+    // Auto-dismiss after 5 seconds
+    setTimeout(() => {
+        $('.alert').alert('close');
+    }, 5000);
+}
+
+function downloadTimetablePDF() {
+    if (!currentTimetableId) {
+        showAlert('No timetable selected for download!', 'warning');
+        return;
+    }
+    
+    // Create a temporary link to trigger download
+    const downloadUrl = `/api/download-timetable-pdf/${currentTimetableId}`;
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = '';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    showAlert('PDF download started!', 'success');
+}
+</script>
+{% endblock %}

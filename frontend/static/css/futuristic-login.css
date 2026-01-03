@@ -1,0 +1,495 @@
+/* Futuristic Login CSS */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --primary-color: #6366f1;
+    --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+    --glass-bg: rgba(255, 255, 255, 0.07);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    --text-color: #ffffff;
+    --text-muted: rgba(255, 255, 255, 0.6);
+    --input-bg: rgba(255, 255, 255, 0.05);
+    --input-border: rgba(255, 255, 255, 0.1);
+    --input-focus: rgba(99, 102, 241, 0.5);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Outfit', sans-serif;
+    overflow: hidden;
+    /* Prevent scrolling on login page */
+}
+
+.login-page-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #0f172a;
+    /* Fallback */
+}
+
+/* Background Image with Overlay */
+.bg-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('../images/login-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    z-index: 0;
+}
+
+.bg-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(15, 23, 42, 0.4), rgba(15, 23, 42, 0.8));
+    backdrop-filter: blur(3px);
+    /* Mild blur for depth */
+    z-index: 1;
+}
+
+/* Glassmorphism Card */
+.glass-card {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 420px;
+    padding: 3rem 2.5rem;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    box-shadow: var(--glass-shadow);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    contain: paint;
+    animation: fadeUp 0.8s ease-out forwards;
+}
+
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Header */
+.login-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.brand-logo {
+    display: block;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: white;
+    letter-spacing: -0.5px;
+}
+
+.brand-logo span {
+    color: #a855f7;
+    /* Accent color for 'ai' part if needed */
+}
+
+.subtitle {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    font-weight: 400;
+}
+
+/* Form Styling */
+.input-group {
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.input-wrapper {
+    position: relative;
+}
+
+.input-field {
+    width: 100%;
+    padding: 1rem 1rem;
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 12px;
+    color: white;
+    font-size: 1rem;
+    font-family: inherit;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    will-change: border-color, box-shadow;
+    outline: none;
+    contain: layout style paint;
+}
+
+.input-field:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.input-label {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    pointer-events: none;
+    transition: transform 0.15s ease, color 0.15s ease;
+    will-change: transform, color;
+    background: transparent;
+    padding: 0 4px;
+    font-size: 1rem;
+    contain: layout style paint;
+}
+
+/* Floating Label Logic */
+.input-field:focus~.input-label,
+.input-field:not(:placeholder-shown)~.input-label {
+    transform: translateY(-160%) scale(0.85);
+    background: rgba(15, 23, 42, 0.8);
+    color: #a855f7;
+    left: 0.8rem;
+    border-radius: 4px;
+}
+
+/* Button */
+.submit-btn {
+    width: 100%;
+    padding: 1rem;
+    border: none;
+    border-radius: 12px;
+    background: var(--primary-gradient);
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+    margin-top: 1rem;
+    position: relative;
+    overflow: hidden;
+    text-transform: uppercase;
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.5);
+}
+
+.submit-btn:active {
+    transform: translateY(0);
+}
+
+/* Loading State */
+.btn-text {
+    transition: opacity 0.3s;
+}
+
+.loading-spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 24px;
+    height: 24px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s linear infinite;
+    display: none;
+}
+
+.submit-btn.loading .btn-text {
+    opacity: 0;
+}
+
+.submit-btn.loading .loading-spinner {
+    display: block;
+}
+
+@keyframes spin {
+    to {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+}
+
+/* Footer / Demo Info */
+.card-footer {
+    margin-top: 2rem;
+    /* padding-top: 1.5rem; */
+    /* border-top: 1px solid var(--glass-border); */
+}
+
+.demo-access {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 1rem;
+    font-size: 0.85rem;
+    border: 1px solid var(--glass-border);
+}
+
+.demo-header {
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    font-weight: 600;
+}
+
+.credentials {
+    display: flex;
+    justify-content: space-between;
+    color: white;
+}
+
+.credentials span strong {
+    color: #a855f7;
+    margin-left: 4px;
+}
+
+/* Error Message */
+.error-msg {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #fca5a5;
+    padding: 0.8rem;
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+    text-align: center;
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes loginToastPop {
+    0% {
+        transform: translateX(-50%) translateY(16px) scale(0.98);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateX(-50%) translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-5px);
+    }
+
+    75% {
+        transform: translateX(5px);
+    }
+}
+
+/* Divider */
+.divider {
+    display: flex;
+    align-items: center;
+    margin: 1.5rem 0;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.875rem;
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.divider span {
+    padding: 0 1rem;
+}
+
+/* Google Button */
+.google-btn {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+    font-size: 0.95rem;
+    font-family: inherit;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.google-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+}
+
+.google-btn:active {
+    transform: translateY(0);
+}
+
+.google-icon {
+    width: 20px;
+    height: 20px;
+}
+
+/* Auth Links */
+.auth-links p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.register-link {
+    color: #a855f7;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.register-link:hover {
+    color: #c084fc;
+    text-decoration: underline;
+}
+
+/* Links */
+.auth-links {
+    text-align: center;
+    margin-top: 1.5rem;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.auth-links a {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    margin-left: 5px;
+    transition: color 0.3s;
+}
+
+.auth-links a:hover {
+    color: #a855f7;
+    text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .glass-card {
+        margin: 1rem;
+        padding: 2rem 1.5rem;
+    }
+
+    .brand-logo {
+        font-size: 1.75rem;
+    }
+}
+
+/* Fix for Login Form Positioning */
+.login-form-container {
+    max-height: 90vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 20px 10px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.login-card {
+    margin: auto;
+    max-width: 450px;
+    width: 100%;
+}
+
+/* Custom Scrollbar for Login */
+.login-form-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.login-form-container::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.login-form-container::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 255, 0.3);
+    border-radius: 10px;
+}
+
+.login-form-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 255, 255, 0.5);
+}
+
+/* Ensure header is visible */
+.login-header {
+    margin-bottom: 24px;
+}
+
+.login-header h1 {
+    font-size: 2rem;
+    margin-bottom: 8px;
+}
+
+/* Reduce input group spacing for login */
+.login-page-container .input-group {
+    margin-bottom: 18px;
+}
+
+/* Make sure everything fits */
+@media (max-height: 800px) {
+    .login-card {
+        padding: 20px;
+    }
+    
+    .login-header h1 {
+        font-size: 1.6rem;
+    }
+    
+    .admin-access-section {
+        margin: 16px 0;
+        padding: 12px;
+    }
+}
+
+/* Ensure form is centered properly */
+.ultra-modern-login-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 40px 20px;
+}

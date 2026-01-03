@@ -1,0 +1,1470 @@
+/* 
+ * ULTRA-INTENSE CINEMATIC LOGIN ANIMATION
+ * MAXIMUM POWER - SYSTEM UNLOCK EFFECT
+ * Significantly more intense than registration page
+ * Fast, loud, visually dominant - unlocking a powerful system
+ */
+
+/* Main container for ultra-intense animation */
+.ultra-intense-login-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 1;
+    background: #000000;
+    pointer-events: none;
+    transform-style: preserve-3d;
+    perspective: 1000px;
+    animation: containerPulse 2s ease-in-out infinite;
+}
+
+@keyframes containerPulse {
+    0%, 100% {
+        filter: brightness(1) contrast(1);
+    }
+    50% {
+        filter: brightness(1.1) contrast(1.2);
+    }
+}
+
+/* VIOLENT INITIAL EXPLOSION - FASTER and MORE INTENSE than registration */
+.mega-explosion {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    transform: translate(-50%, -50%);
+    opacity: 1;
+    animation: megaExplode 0.3s cubic-bezier(0.1, 0, 0.1, 1) forwards;
+    filter: brightness(1.5) contrast(1.3);
+}
+
+.mega-explosion::before,
+.mega-explosion::after,
+.mega-explosion .explosion-layer {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.mega-explosion::before {
+    background: radial-gradient(circle, #ffffff 0%, #ff0000 15%, #ff0080 30%, #0000ff 50%, transparent 70%);
+    animation: explosionLayer1 0.25s cubic-bezier(0.1, 0, 0.1, 1) forwards;
+    box-shadow: 0 0 300px #ff0000, 0 0 500px #ff0080, 0 0 700px #ff0000;
+    filter: brightness(2) saturate(1.5);
+}
+
+.mega-explosion::after {
+    background: radial-gradient(circle, #00ffff 0%, #0000ff 20%, #ff00ff 40%, #ff0000 60%, transparent 80%);
+    animation: explosionLayer2 0.3s cubic-bezier(0.1, 0, 0.1, 1) 0.03s forwards;
+    box-shadow: 0 0 350px #00ffff, 0 0 600px #0000ff, 0 0 800px #00ffff;
+    filter: brightness(2) saturate(1.5);
+}
+
+@keyframes megaExplode {
+    0% {
+        width: 0;
+        height: 0;
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(0) rotate(0deg);
+    }
+    20% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(0.5) rotate(180deg);
+    }
+    100% {
+        width: 400vw;
+        height: 400vh;
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1) rotate(360deg);
+    }
+}
+
+@keyframes explosionLayer1 {
+    0% {
+        width: 0;
+        height: 0;
+        opacity: 1;
+    }
+    100% {
+        width: 250vw;
+        height: 250vh;
+        opacity: 0;
+    }
+}
+
+@keyframes explosionLayer2 {
+    0% {
+        width: 0;
+        height: 0;
+        opacity: 1;
+    }
+    100% {
+        width: 280vw;
+        height: 280vh;
+        opacity: 0;
+    }
+}
+
+/* VIOLENT SHOCKWAVES - Multiple aggressive waves */
+.shockwave-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.shockwave {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border: 3px solid;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.shockwave-1 {
+    border-color: #ff0000;
+    border-width: 4px;
+    box-shadow: 0 0 80px #ff0000, 0 0 150px #ff0000, 0 0 200px #ff0000;
+    animation: shockwave1 0.7s infinite;
+    animation-delay: 0s;
+    filter: brightness(1.5);
+}
+
+.shockwave-2 {
+    border-color: #00ffff;
+    border-width: 4px;
+    box-shadow: 0 0 80px #00ffff, 0 0 150px #00ffff, 0 0 200px #00ffff;
+    animation: shockwave2 0.8s infinite;
+    animation-delay: 0.2s;
+    filter: brightness(1.5);
+}
+
+.shockwave-3 {
+    border-color: #ffff00;
+    border-width: 4px;
+    box-shadow: 0 0 80px #ffff00, 0 0 150px #ffff00, 0 0 200px #ffff00;
+    animation: shockwave3 0.75s infinite;
+    animation-delay: 0.4s;
+    filter: brightness(1.5);
+}
+
+.shockwave-4 {
+    border-color: #ff00ff;
+    border-width: 4px;
+    box-shadow: 0 0 80px #ff00ff, 0 0 150px #ff00ff, 0 0 200px #ff00ff;
+    animation: shockwave4 0.85s infinite;
+    animation-delay: 0.6s;
+    filter: brightness(1.5);
+}
+
+.shockwave-5 {
+    border-color: #0000ff;
+    border-width: 4px;
+    box-shadow: 0 0 80px #0000ff, 0 0 150px #0000ff, 0 0 200px #0000ff;
+    animation: shockwave5 0.8s infinite;
+    animation-delay: 0.8s;
+    filter: brightness(1.5);
+}
+
+@keyframes shockwave1 {
+    0% {
+        width: 0;
+        height: 0;
+        opacity: 1;
+    }
+    100% {
+        width: 200vw;
+        height: 200vh;
+        opacity: 0;
+    }
+}
+
+@keyframes shockwave2 {
+    0% {
+        width: 0;
+        height: 0;
+        opacity: 1;
+    }
+    100% {
+        width: 220vw;
+        height: 220vh;
+        opacity: 0;
+    }
+}
+
+@keyframes shockwave3 {
+    0% {
+        width: 0;
+        height: 0;
+        opacity: 1;
+    }
+    100% {
+        width: 240vw;
+        height: 240vh;
+        opacity: 0;
+    }
+}
+
+@keyframes shockwave4 {
+    0% {
+        width: 0;
+        height: 0;
+        opacity: 1;
+    }
+    100% {
+        width: 260vw;
+        height: 260vh;
+        opacity: 0;
+    }
+}
+
+@keyframes shockwave5 {
+    0% {
+        width: 0;
+        height: 0;
+        opacity: 1;
+    }
+    100% {
+        width: 280vw;
+        height: 280vh;
+        opacity: 0;
+    }
+}
+
+/* FRACTURED ABSTRACT ELEMENTS - Sharp, aggressive fragments */
+.fracture-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.fracture {
+    position: absolute;
+    opacity: 0.95;
+    filter: drop-shadow(0 0 15px currentColor);
+    animation-timing-function: linear;
+    transform-origin: center;
+}
+
+/* Large aggressive triangular fractures */
+.fracture-1 {
+    width: 0;
+    height: 0;
+    border-left: 30px solid transparent;
+    border-right: 30px solid transparent;
+    border-bottom: 60px solid #ff0000;
+    top: 15%;
+    left: 5%;
+    animation: fractureMove1 1.2s infinite;
+    animation-delay: 0s;
+    filter: drop-shadow(0 0 20px currentColor) brightness(1.3);
+}
+
+.fracture-2 {
+    width: 0;
+    height: 0;
+    border-left: 35px solid transparent;
+    border-right: 35px solid transparent;
+    border-top: 70px solid #00ffff;
+    top: 25%;
+    left: 90%;
+    animation: fractureMove2 1.0s infinite;
+    animation-delay: 0.2s;
+    filter: drop-shadow(0 0 20px currentColor) brightness(1.3);
+}
+
+.fracture-3 {
+    width: 0;
+    height: 0;
+    border-left: 28px solid transparent;
+    border-right: 28px solid transparent;
+    border-bottom: 55px solid #ffff00;
+    top: 55%;
+    left: 10%;
+    animation: fractureMove3 1.15s infinite;
+    animation-delay: 0.4s;
+    filter: drop-shadow(0 0 20px currentColor) brightness(1.3);
+}
+
+.fracture-4 {
+    width: 0;
+    height: 0;
+    border-left: 35px solid transparent;
+    border-right: 35px solid transparent;
+    border-top: 70px solid #ff00ff;
+    top: 65%;
+    left: 80%;
+    animation: fractureMove4 1.7s infinite;
+    animation-delay: 0.6s;
+}
+
+.fracture-5 {
+    width: 0;
+    height: 0;
+    border-left: 22px solid transparent;
+    border-right: 22px solid transparent;
+    border-bottom: 45px solid #00ff00;
+    top: 5%;
+    left: 45%;
+    animation: fractureMove5 1.85s infinite;
+    animation-delay: 0.8s;
+}
+
+.fracture-6 {
+    width: 0;
+    height: 0;
+    border-left: 28px solid transparent;
+    border-right: 28px solid transparent;
+    border-top: 55px solid #0000ff;
+    top: 85%;
+    left: 35%;
+    animation: fractureMove6 1.75s infinite;
+    animation-delay: 1.0s;
+}
+
+.fracture-7 {
+    width: 0;
+    height: 0;
+    border-left: 32px solid transparent;
+    border-right: 32px solid transparent;
+    border-bottom: 65px solid #ff0080;
+    top: 35%;
+    left: 2%;
+    animation: fractureMove7 1.9s infinite;
+    animation-delay: 1.2s;
+}
+
+.fracture-8 {
+    width: 0;
+    height: 0;
+    border-left: 18px solid transparent;
+    border-right: 18px solid transparent;
+    border-top: 35px solid #00ffff;
+    top: 45%;
+    left: 95%;
+    animation: fractureMove8 1.65s infinite;
+    animation-delay: 1.4s;
+}
+
+.fracture-9 {
+    width: 0;
+    height: 0;
+    border-left: 26px solid transparent;
+    border-right: 26px solid transparent;
+    border-bottom: 52px solid #ff0000;
+    top: 75%;
+    left: 15%;
+    animation: fractureMove9 1.8s infinite;
+    animation-delay: 1.6s;
+}
+
+.fracture-10 {
+    width: 0;
+    height: 0;
+    border-left: 24px solid transparent;
+    border-right: 24px solid transparent;
+    border-top: 48px solid #ffff00;
+    top: 20%;
+    left: 60%;
+    animation: fractureMove10 1.7s infinite;
+    animation-delay: 1.8s;
+}
+
+/* Violent fracture movement - FASTER and MORE AGGRESSIVE than registration */
+@keyframes fractureMove1 {
+    0% {
+        transform: translate(0, 0) rotate(0deg) scale(1);
+        opacity: 0;
+    }
+    3% {
+        opacity: 1;
+    }
+    97% {
+        opacity: 1;
+    }
+    100% {
+        transform: translate(700px, -800px) rotate(1440deg) scale(0.1);
+        opacity: 0;
+    }
+}
+
+@keyframes fractureMove2 {
+    0% {
+        transform: translate(0, 0) rotate(0deg) scale(1);
+        opacity: 0;
+    }
+    3% {
+        opacity: 1;
+    }
+    97% {
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-750px, 850px) rotate(-1260deg) scale(0.1);
+        opacity: 0;
+    }
+}
+
+@keyframes fractureMove3 {
+    0% {
+        transform: translate(0, 0) rotate(0deg) scale(1);
+        opacity: 0;
+    }
+    3% {
+        opacity: 1;
+    }
+    97% {
+        opacity: 1;
+    }
+    100% {
+        transform: translate(800px, 500px) rotate(1620deg) scale(0.1);
+        opacity: 0;
+    }
+}
+
+@keyframes fractureMove4 {
+    0% {
+        transform: translate(0, 0) rotate(0deg) scale(1);
+        opacity: 0;
+    }
+    5% {
+        opacity: 1;
+    }
+    95% {
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-450px, -500px) rotate(-1080deg) scale(0.2);
+        opacity: 0;
+    }
+}
+
+@keyframes fractureMove5 {
+    0% {
+        transform: translate(0, 0) rotate(0deg) scale(1);
+        opacity: 0;
+    }
+    5% {
+        opacity: 1;
+    }
+    95% {
+        opacity: 1;
+    }
+    100% {
+        transform: translate(400px, 700px) rotate(1350deg) scale(0.3);
+        opacity: 0;
+    }
+}
+
+@keyframes fractureMove6 {
+    0% {
+        transform: translate(0, 0) rotate(0deg) scale(1);
+        opacity: 0;
+    }
+    5% {
+        opacity: 1;
+    }
+    95% {
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-600px, -450px) rotate(-720deg) scale(0.25);
+        opacity: 0;
+    }
+}
+
+@keyframes fractureMove7 {
+    0% {
+        transform: translate(0, 0) rotate(0deg) scale(1);
+        opacity: 0;
+    }
+    5% {
+        opacity: 1;
+    }
+    95% {
+        opacity: 1;
+    }
+    100% {
+        transform: translate(550px, -650px) rotate(1440deg) scale(0.15);
+        opacity: 0;
+    }
+}
+
+@keyframes fractureMove8 {
+    0% {
+        transform: translate(0, 0) rotate(0deg) scale(1);
+        opacity: 0;
+    }
+    5% {
+        opacity: 1;
+    }
+    95% {
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-500px, 550px) rotate(-990deg) scale(0.3);
+        opacity: 0;
+    }
+}
+
+@keyframes fractureMove9 {
+    0% {
+        transform: translate(0, 0) rotate(0deg) scale(1);
+        opacity: 0;
+    }
+    5% {
+        opacity: 1;
+    }
+    95% {
+        opacity: 1;
+    }
+    100% {
+        transform: translate(450px, -500px) rotate(1170deg) scale(0.2);
+        opacity: 0;
+    }
+}
+
+@keyframes fractureMove10 {
+    0% {
+        transform: translate(0, 0) rotate(0deg) scale(1);
+        opacity: 0;
+    }
+    5% {
+        opacity: 1;
+    }
+    95% {
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-550px, 600px) rotate(-810deg) scale(0.25);
+        opacity: 0;
+    }
+}
+
+/* AGGRESSIVE CAMERA MOVEMENT - Shake and zoom effects */
+.camera-shake {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    animation: violentShake 0.08s infinite;
+    animation-delay: 0s;
+}
+
+@keyframes violentShake {
+    0%, 100% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+    10% {
+        transform: translate(-3px, -2px) rotate(-0.5deg);
+    }
+    20% {
+        transform: translate(2px, 3px) rotate(0.5deg);
+    }
+    30% {
+        transform: translate(-2px, 2px) rotate(-0.3deg);
+    }
+    40% {
+        transform: translate(3px, -3px) rotate(0.3deg);
+    }
+    50% {
+        transform: translate(-1px, -2px) rotate(-0.2deg);
+    }
+    60% {
+        transform: translate(2px, 1px) rotate(0.2deg);
+    }
+    70% {
+        transform: translate(-3px, 2px) rotate(-0.4deg);
+    }
+    80% {
+        transform: translate(1px, -1px) rotate(0.4deg);
+    }
+    90% {
+        transform: translate(-2px, 3px) rotate(-0.3deg);
+    }
+}
+
+/* POWER SURGE EFFECTS - Electrical energy bursts */
+.power-surge-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.power-surge {
+    position: absolute;
+    width: 4px;
+    height: 200px;
+    background: linear-gradient(180deg, transparent, currentColor, transparent);
+    opacity: 0;
+    filter: blur(2px);
+    box-shadow: 0 0 20px currentColor, 0 0 40px currentColor;
+    animation-timing-function: linear;
+}
+
+.power-surge-1 {
+    top: 10%;
+    left: 20%;
+    color: #ff0000;
+    animation: powerSurge1 1.2s infinite;
+    animation-delay: 0s;
+}
+
+.power-surge-2 {
+    top: 30%;
+    left: 80%;
+    color: #00ffff;
+    animation: powerSurge2 1.4s infinite;
+    animation-delay: 0.3s;
+}
+
+.power-surge-3 {
+    top: 60%;
+    left: 15%;
+    color: #ffff00;
+    animation: powerSurge3 1.3s infinite;
+    animation-delay: 0.6s;
+}
+
+.power-surge-4 {
+    top: 80%;
+    left: 70%;
+    color: #ff00ff;
+    animation: powerSurge4 1.5s infinite;
+    animation-delay: 0.9s;
+}
+
+.power-surge-5 {
+    top: 20%;
+    left: 50%;
+    color: #00ff00;
+    animation: powerSurge5 1.25s infinite;
+    animation-delay: 1.2s;
+}
+
+.power-surge-6 {
+    top: 70%;
+    left: 40%;
+    color: #0000ff;
+    animation: powerSurge6 1.35s infinite;
+    animation-delay: 1.5s;
+}
+
+@keyframes powerSurge1 {
+    0% {
+        top: 10%;
+        opacity: 0;
+        transform: scaleY(0);
+    }
+    20% {
+        opacity: 1;
+    }
+    80% {
+        opacity: 1;
+    }
+    100% {
+        top: 90%;
+        opacity: 0;
+        transform: scaleY(1.5);
+    }
+}
+
+@keyframes powerSurge2 {
+    0% {
+        top: 30%;
+        opacity: 0;
+        transform: scaleY(0);
+    }
+    20% {
+        opacity: 1;
+    }
+    80% {
+        opacity: 1;
+    }
+    100% {
+        top: -10%;
+        opacity: 0;
+        transform: scaleY(1.5);
+    }
+}
+
+@keyframes powerSurge3 {
+    0% {
+        top: 60%;
+        opacity: 0;
+        transform: scaleY(0);
+    }
+    20% {
+        opacity: 1;
+    }
+    80% {
+        opacity: 1;
+    }
+    100% {
+        top: 100%;
+        opacity: 0;
+        transform: scaleY(1.5);
+    }
+}
+
+@keyframes powerSurge4 {
+    0% {
+        top: 80%;
+        opacity: 0;
+        transform: scaleY(0);
+    }
+    20% {
+        opacity: 1;
+    }
+    80% {
+        opacity: 1;
+    }
+    100% {
+        top: -20%;
+        opacity: 0;
+        transform: scaleY(1.5);
+    }
+}
+
+@keyframes powerSurge5 {
+    0% {
+        top: 20%;
+        opacity: 0;
+        transform: scaleY(0);
+    }
+    20% {
+        opacity: 1;
+    }
+    80% {
+        opacity: 1;
+    }
+    100% {
+        top: 80%;
+        opacity: 0;
+        transform: scaleY(1.5);
+    }
+}
+
+@keyframes powerSurge6 {
+    0% {
+        top: 70%;
+        opacity: 0;
+        transform: scaleY(0);
+    }
+    20% {
+        opacity: 1;
+    }
+    80% {
+        opacity: 1;
+    }
+    100% {
+        top: 10%;
+        opacity: 0;
+        transform: scaleY(1.5);
+    }
+}
+
+/* RAPID SCANNING LINES - High-speed security scan effect */
+.scan-lines-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.scan-line {
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, currentColor, transparent);
+    opacity: 0.9;
+    filter: blur(1px);
+    box-shadow: 0 0 15px currentColor, 0 0 30px currentColor;
+    animation-timing-function: linear;
+}
+
+.scan-line-1 {
+    top: -2px;
+    color: #ff0000;
+    animation: scanLine1 1.0s infinite;
+    animation-delay: 0s;
+}
+
+.scan-line-2 {
+    top: -2px;
+    color: #00ffff;
+    animation: scanLine2 1.2s infinite;
+    animation-delay: 0.4s;
+}
+
+.scan-line-3 {
+    top: -2px;
+    color: #ffff00;
+    animation: scanLine3 1.1s infinite;
+    animation-delay: 0.8s;
+}
+
+@keyframes scanLine1 {
+    0% {
+        top: -2px;
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        top: 100vh;
+        opacity: 0;
+    }
+}
+
+@keyframes scanLine2 {
+    0% {
+        top: -2px;
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        top: 100vh;
+        opacity: 0;
+    }
+}
+
+@keyframes scanLine3 {
+    0% {
+        top: -2px;
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        top: 100vh;
+        opacity: 0;
+    }
+}
+
+/* EXTREME GLITCH EFFECT - More aggressive than registration */
+.extreme-glitch {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    mix-blend-mode: screen;
+    animation: extremeGlitchFlicker 0.08s infinite;
+}
+
+.extreme-glitch::before,
+.extreme-glitch::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+}
+
+.extreme-glitch::before {
+    animation: extremeGlitchShift1 0.2s infinite;
+    clip-path: polygon(0 0, 100% 0, 100% 40%, 0 40%);
+}
+
+.extreme-glitch::after {
+    animation: extremeGlitchShift2 0.15s infinite;
+    clip-path: polygon(0 60%, 100% 60%, 100% 100%, 0 100%);
+}
+
+@keyframes extremeGlitchFlicker {
+    0%, 100% {
+        opacity: 0;
+    }
+    25% {
+        opacity: 0.15;
+    }
+    50% {
+        opacity: 0.1;
+    }
+    75% {
+        opacity: 0.2;
+    }
+}
+
+@keyframes extremeGlitchShift1 {
+    0%, 100% {
+        transform: translateX(0) translateY(0);
+        filter: hue-rotate(0deg) brightness(1);
+    }
+    20% {
+        transform: translateX(-4px) translateY(2px);
+        filter: hue-rotate(90deg) brightness(1.5);
+    }
+    40% {
+        transform: translateX(4px) translateY(-2px);
+        filter: hue-rotate(180deg) brightness(0.8);
+    }
+    60% {
+        transform: translateX(-3px) translateY(-3px);
+        filter: hue-rotate(270deg) brightness(1.3);
+    }
+    80% {
+        transform: translateX(3px) translateY(3px);
+        filter: hue-rotate(360deg) brightness(1.1);
+    }
+}
+
+@keyframes extremeGlitchShift2 {
+    0%, 100% {
+        transform: translateX(0) translateY(0);
+        filter: hue-rotate(0deg) brightness(1);
+    }
+    20% {
+        transform: translateX(4px) translateY(-2px);
+        filter: hue-rotate(-90deg) brightness(1.4);
+    }
+    40% {
+        transform: translateX(-4px) translateY(2px);
+        filter: hue-rotate(-180deg) brightness(0.9);
+    }
+    60% {
+        transform: translateX(3px) translateY(3px);
+        filter: hue-rotate(-270deg) brightness(1.2);
+    }
+    80% {
+        transform: translateX(-3px) translateY(-3px);
+        filter: hue-rotate(-360deg) brightness(1.0);
+    }
+}
+
+/* ULTRA BRIGHT SCREEN FLASH - FASTER and MORE INTENSE than registration */
+.ultra-screen-flash {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 2000;
+    animation: ultraScreenFlash 0.4s ease-out forwards;
+    filter: brightness(1.5);
+}
+
+@keyframes ultraScreenFlash {
+    0% {
+        background: #ffffff;
+        opacity: 1;
+    }
+    15% {
+        background: #ff0000;
+        opacity: 0.9;
+    }
+    30% {
+        background: #0000ff;
+        opacity: 0.8;
+    }
+    45% {
+        background: #00ffff;
+        opacity: 0.7;
+    }
+    60% {
+        background: #ff00ff;
+        opacity: 0.5;
+    }
+    75% {
+        background: #ffff00;
+        opacity: 0.3;
+    }
+    100% {
+        background: transparent;
+        opacity: 0;
+    }
+}
+
+/* ENERGY PULSE RINGS - Continuous power pulses */
+.energy-pulse-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.energy-pulse {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border: 2px solid;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    animation-timing-function: ease-out;
+}
+
+.energy-pulse-1 {
+    border-color: #ff0000;
+    box-shadow: 0 0 30px #ff0000, 0 0 60px #ff0000;
+    animation: energyPulse1 1.5s infinite;
+    animation-delay: 0s;
+}
+
+.energy-pulse-2 {
+    border-color: #00ffff;
+    box-shadow: 0 0 30px #00ffff, 0 0 60px #00ffff;
+    animation: energyPulse2 1.7s infinite;
+    animation-delay: 0.5s;
+}
+
+.energy-pulse-3 {
+    border-color: #ffff00;
+    box-shadow: 0 0 30px #ffff00, 0 0 60px #ffff00;
+    animation: energyPulse3 1.6s infinite;
+    animation-delay: 1.0s;
+}
+
+@keyframes energyPulse1 {
+    0% {
+        width: 0;
+        height: 0;
+        opacity: 1;
+    }
+    100% {
+        width: 300vw;
+        height: 300vh;
+        opacity: 0;
+    }
+}
+
+@keyframes energyPulse2 {
+    0% {
+        width: 0;
+        height: 0;
+        opacity: 1;
+    }
+    100% {
+        width: 320vw;
+        height: 320vh;
+        opacity: 0;
+    }
+}
+
+@keyframes energyPulse3 {
+    0% {
+        width: 0;
+        height: 0;
+        opacity: 1;
+    }
+    100% {
+        width: 340vw;
+        height: 340vh;
+        opacity: 0;
+    }
+}
+
+/* SYSTEM UNLOCK EFFECT - Visual representation of unlocking */
+.system-unlock-effect {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 200px;
+    height: 200px;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    animation: systemUnlock 1.5s ease-out forwards;
+    z-index: 100;
+}
+
+.system-unlock-effect::before,
+.system-unlock-effect::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 4px solid;
+    border-radius: 50%;
+}
+
+.system-unlock-effect::before {
+    width: 150px;
+    height: 150px;
+    border-color: #00ffff;
+    box-shadow: 0 0 50px #00ffff, 0 0 100px #00ffff;
+    animation: unlockRing1 1.5s ease-out forwards;
+}
+
+.system-unlock-effect::after {
+    width: 100px;
+    height: 100px;
+    border-color: #ff00ff;
+    box-shadow: 0 0 50px #ff00ff, 0 0 100px #ff00ff;
+    animation: unlockRing2 1.5s ease-out forwards;
+}
+
+@keyframes systemUnlock {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0) rotate(0deg);
+    }
+    30% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.2) rotate(180deg);
+    }
+    60% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1) rotate(360deg);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1.5) rotate(540deg);
+    }
+}
+
+@keyframes unlockRing1 {
+    0% {
+        width: 0;
+        height: 0;
+        opacity: 1;
+    }
+    100% {
+        width: 300px;
+        height: 300px;
+        opacity: 0;
+    }
+}
+
+@keyframes unlockRing2 {
+    0% {
+        width: 0;
+        height: 0;
+        opacity: 1;
+    }
+    100% {
+        width: 250px;
+        height: 250px;
+        opacity: 0;
+    }
+}
+
+/* UNLOCK PARTICLES - Explosive particles on unlock */
+.unlock-particles {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    transform: translate(-50%, -50%);
+}
+
+.unlock-particle {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    box-shadow: 0 0 15px currentColor, 0 0 30px currentColor;
+    opacity: 0;
+    animation-timing-function: ease-out;
+}
+
+.unlock-particle-1 {
+    color: #ff0000;
+    animation: unlockParticle1 1.0s ease-out forwards;
+    animation-delay: 0s;
+}
+
+.unlock-particle-2 {
+    color: #00ffff;
+    animation: unlockParticle2 1.0s ease-out forwards;
+    animation-delay: 0.1s;
+}
+
+.unlock-particle-3 {
+    color: #ffff00;
+    animation: unlockParticle3 1.0s ease-out forwards;
+    animation-delay: 0.2s;
+}
+
+.unlock-particle-4 {
+    color: #ff00ff;
+    animation: unlockParticle4 1.0s ease-out forwards;
+    animation-delay: 0.3s;
+}
+
+.unlock-particle-5 {
+    color: #00ff00;
+    animation: unlockParticle5 1.0s ease-out forwards;
+    animation-delay: 0.4s;
+}
+
+.unlock-particle-6 {
+    color: #0000ff;
+    animation: unlockParticle6 1.0s ease-out forwards;
+    animation-delay: 0.5s;
+}
+
+.unlock-particle-7 {
+    color: #ff0080;
+    animation: unlockParticle7 1.0s ease-out forwards;
+    animation-delay: 0.6s;
+}
+
+.unlock-particle-8 {
+    color: #00ffff;
+    animation: unlockParticle8 1.0s ease-out forwards;
+    animation-delay: 0.7s;
+}
+
+@keyframes unlockParticle1 {
+    0% {
+        transform: translate(0, 0) scale(0);
+        opacity: 1;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        transform: translate(400px, -300px) scale(1.5);
+        opacity: 0;
+    }
+}
+
+@keyframes unlockParticle2 {
+    0% {
+        transform: translate(0, 0) scale(0);
+        opacity: 1;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-400px, 300px) scale(1.5);
+        opacity: 0;
+    }
+}
+
+@keyframes unlockParticle3 {
+    0% {
+        transform: translate(0, 0) scale(0);
+        opacity: 1;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        transform: translate(300px, 400px) scale(1.5);
+        opacity: 0;
+    }
+}
+
+@keyframes unlockParticle4 {
+    0% {
+        transform: translate(0, 0) scale(0);
+        opacity: 1;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-300px, -400px) scale(1.5);
+        opacity: 0;
+    }
+}
+
+@keyframes unlockParticle5 {
+    0% {
+        transform: translate(0, 0) scale(0);
+        opacity: 1;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        transform: translate(500px, 200px) scale(1.5);
+        opacity: 0;
+    }
+}
+
+@keyframes unlockParticle6 {
+    0% {
+        transform: translate(0, 0) scale(0);
+        opacity: 1;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-500px, -200px) scale(1.5);
+        opacity: 0;
+    }
+}
+
+@keyframes unlockParticle7 {
+    0% {
+        transform: translate(0, 0) scale(0);
+        opacity: 1;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        transform: translate(200px, -500px) scale(1.5);
+        opacity: 0;
+    }
+}
+
+@keyframes unlockParticle8 {
+    0% {
+        transform: translate(0, 0) scale(0);
+        opacity: 1;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-200px, 500px) scale(1.5);
+        opacity: 0;
+    }
+}
+
+/* FASTER SCAN LINES */
+.scan-line-1 {
+    top: -2px;
+    color: #ff0000;
+    animation: scanLine1 0.7s infinite;
+    animation-delay: 0s;
+}
+
+.scan-line-2 {
+    top: -2px;
+    color: #00ffff;
+    animation: scanLine2 0.8s infinite;
+    animation-delay: 0.25s;
+}
+
+.scan-line-3 {
+    top: -2px;
+    color: #ffff00;
+    animation: scanLine3 0.75s infinite;
+    animation-delay: 0.5s;
+}
+
+/* MORE AGGRESSIVE CAMERA SHAKE */
+@keyframes violentShake {
+    0%, 100% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+    5% {
+        transform: translate(-5px, -4px) rotate(-1deg);
+    }
+    10% {
+        transform: translate(4px, 5px) rotate(1deg);
+    }
+    15% {
+        transform: translate(-4px, 3px) rotate(-0.8deg);
+    }
+    20% {
+        transform: translate(5px, -5px) rotate(0.8deg);
+    }
+    25% {
+        transform: translate(-3px, -3px) rotate(-0.5deg);
+    }
+    30% {
+        transform: translate(3px, 2px) rotate(0.5deg);
+    }
+    35% {
+        transform: translate(-5px, 4px) rotate(-1.2deg);
+    }
+    40% {
+        transform: translate(2px, -2px) rotate(1.2deg);
+    }
+    45% {
+        transform: translate(-4px, 5px) rotate(-0.7deg);
+    }
+    50% {
+        transform: translate(4px, -3px) rotate(0.7deg);
+    }
+    55% {
+        transform: translate(-3px, -4px) rotate(-0.9deg);
+    }
+    60% {
+        transform: translate(5px, 3px) rotate(0.9deg);
+    }
+    65% {
+        transform: translate(-2px, 4px) rotate(-0.6deg);
+    }
+    70% {
+        transform: translate(3px, -5px) rotate(0.6deg);
+    }
+    75% {
+        transform: translate(-5px, -2px) rotate(-1.1deg);
+    }
+    80% {
+        transform: translate(2px, 5px) rotate(1.1deg);
+    }
+    85% {
+        transform: translate(-4px, -5px) rotate(-0.8deg);
+    }
+    90% {
+        transform: translate(5px, 2px) rotate(0.8deg);
+    }
+    95% {
+        transform: translate(-3px, 3px) rotate(-0.7deg);
+    }
+}
+
+/* Performance optimizations */
+.ultra-intense-login-container * {
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .fracture {
+        border-width: 12px !important;
+    }
+    
+    .scan-line {
+        height: 1px;
+    }
+    
+    .power-surge {
+        width: 3px;
+    }
+    
+    .camera-shake {
+        animation-duration: 0.15s;
+    }
+}
+

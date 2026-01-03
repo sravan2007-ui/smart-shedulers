@@ -1,0 +1,219 @@
+<svg width="1400" height="900" viewBox="0 0 1400 900" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Advanced Gradients -->
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f0f23;stop-opacity:0.02"/>
+      <stop offset="30%" style="stop-color:#1a1a2e;stop-opacity:0.015"/>
+      <stop offset="70%" style="stop-color:#16213e;stop-opacity:0.015"/>
+      <stop offset="100%" style="stop-color:#0f3460;stop-opacity:0.02"/>
+    </linearGradient>
+    
+    <linearGradient id="roboticHandGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00d4ff;stop-opacity:0.9"/>
+      <stop offset="50%" style="stop-color:#5b73ff;stop-opacity:0.8"/>
+      <stop offset="100%" style="stop-color:#667eea;stop-opacity:0.7"/>
+    </linearGradient>
+    
+    <linearGradient id="hologramGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00ffff;stop-opacity:0.15"/>
+      <stop offset="50%" style="stop-color:#8a2be2;stop-opacity:0.1"/>
+      <stop offset="100%" style="stop-color:#4169e1;stop-opacity:0.12"/>
+    </linearGradient>
+
+    <radialGradient id="glowEffect" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#00d4ff;stop-opacity:0.8"/>
+      <stop offset="70%" style="stop-color:#5b73ff;stop-opacity:0.3"/>
+      <stop offset="100%" style="stop-color:#667eea;stop-opacity:0"/>
+    </radialGradient>
+
+    <!-- Advanced Filters -->
+    <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="holographicEffect" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="1" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.6 0"/>
+    </filter>
+  </defs>
+
+  <!-- Clean Futuristic Background -->
+  <rect width="1400" height="900" fill="url(#bgGradient)"/>
+  
+  <!-- Abstract Digital Waves -->
+  <g opacity="0.08">
+    <path d="M0,400 Q350,300 700,400 T1400,400" stroke="#00d4ff" stroke-width="2" fill="none">
+      <animate attributeName="d" values="M0,400 Q350,300 700,400 T1400,400;M0,420 Q350,320 700,420 T1400,420;M0,400 Q350,300 700,400 T1400,400" dur="8s" repeatCount="indefinite"/>
+    </path>
+    <path d="M0,500 Q350,600 700,500 T1400,500" stroke="#5b73ff" stroke-width="1.5" fill="none">
+      <animate attributeName="d" values="M0,500 Q350,600 700,500 T1400,500;M0,480 Q350,580 700,480 T1400,480;M0,500 Q350,600 700,500 T1400,500" dur="10s" repeatCount="indefinite"/>
+    </path>
+  </g>
+
+  <!-- Minimal Circuit Lines -->
+  <g opacity="0.06" stroke="#00ffff" stroke-width="1" fill="none">
+    <path d="M100,100 L200,100 L200,200 L300,200">
+      <animate attributeName="stroke-dasharray" values="0,400; 400,0; 0,400" dur="12s" repeatCount="indefinite"/>
+    </path>
+    <path d="M1100,150 L1200,150 L1200,250 L1300,250">
+      <animate attributeName="stroke-dasharray" values="400,0; 0,400; 400,0" dur="15s" repeatCount="indefinite"/>
+    </path>
+  </g>
+
+  <!-- Holographic Timetable Screen -->
+  <g transform="translate(750, 180)" filter="url(#holographicEffect)">
+    <!-- Holographic Frame -->
+    <rect x="0" y="0" width="500" height="350" fill="url(#hologramGradient)" rx="15" stroke="#00ffff" stroke-width="1" opacity="0.4">
+      <animate attributeName="opacity" values="0.3;0.5;0.3" dur="4s" repeatCount="indefinite"/>
+    </rect>
+    
+    <!-- Holographic Grid -->
+    <g stroke="#00d4ff" stroke-width="0.8" fill="none" opacity="0.25">
+      <!-- Horizontal lines -->
+      <line x1="20" y1="70" x2="480" y2="70"/>
+      <line x1="20" y1="120" x2="480" y2="120"/>
+      <line x1="20" y1="170" x2="480" y2="170"/>
+      <line x1="20" y1="220" x2="480" y2="220"/>
+      <line x1="20" y1="270" x2="480" y2="270"/>
+      
+      <!-- Vertical lines -->
+      <line x1="100" y1="20" x2="100" y2="330"/>
+      <line x1="200" y1="20" x2="200" y2="330"/>
+      <line x1="300" y1="20" x2="300" y2="330"/>
+      <line x1="400" y1="20" x2="400" y2="330"/>
+    </g>
+    
+    <!-- Glowing Timetable Entries -->
+    <g filter="url(#neonGlow)" opacity="0.6">
+      <rect x="105" y="75" width="90" height="40" fill="#00d4ff" rx="5" opacity="0.4">
+        <animate attributeName="opacity" values="0.2;0.6;0.2" dur="3s" repeatCount="indefinite"/>
+      </rect>
+      <rect x="205" y="125" width="90" height="40" fill="#5b73ff" rx="5" opacity="0.4">
+        <animate attributeName="opacity" values="0.6;0.2;0.6" dur="3.5s" repeatCount="indefinite"/>
+      </rect>
+      <rect x="305" y="175" width="90" height="40" fill="#8a2be2" rx="5" opacity="0.4">
+        <animate attributeName="opacity" values="0.4;0.7;0.4" dur="4s" repeatCount="indefinite"/>
+      </rect>
+    </g>
+    
+    <!-- Holographic Scan Lines -->
+    <g opacity="0.15">
+      <rect x="0" y="0" width="500" height="2" fill="#00ffff">
+        <animateTransform attributeName="transform" type="translate" values="0,0; 0,350; 0,0" dur="6s" repeatCount="indefinite"/>
+      </rect>
+    </g>
+  </g>
+
+  <!-- Sleek Futuristic AI Robotic Hand -->
+  <g transform="translate(450, 350)" filter="url(#neonGlow)">
+    <animateTransform attributeName="transform" type="translate" 
+                      values="450,350; 450,340; 450,350" dur="4s" repeatCount="indefinite"/>
+    
+    <!-- Robotic Hand Base -->
+    <g fill="url(#roboticHandGradient)" opacity="0.8">
+      <!-- Palm with segmented design -->
+      <path d="M0,0 Q-30,-20 -35,20 Q-30,60 0,50 Q30,60 35,20 Q30,-20 0,0 Z"/>
+      
+      <!-- Robotic Fingers with joints -->
+      <g>
+        <!-- Index finger -->
+        <rect x="-25" y="-45" width="12" height="25" rx="6" opacity="0.9"/>
+        <circle cx="-19" cy="-35" r="3" fill="#00d4ff"/>
+        <rect x="-25" y="-25" width="12" height="20" rx="6" opacity="0.85"/>
+        
+        <!-- Middle finger -->
+        <rect x="-8" y="-50" width="12" height="28" rx="6" opacity="0.9"/>
+        <circle cx="-2" cy="-38" r="3" fill="#00d4ff"/>
+        <rect x="-8" y="-28" width="12" height="22" rx="6" opacity="0.85"/>
+        
+        <!-- Ring finger -->
+        <rect x="8" y="-48" width="12" height="26" rx="6" opacity="0.9"/>
+        <circle cx="14" cy="-36" r="3" fill="#00d4ff"/>
+        <rect x="8" y="-26" width="12" height="20" rx="6" opacity="0.85"/>
+        
+        <!-- Pinky finger -->
+        <rect x="25" y="-42" width="10" height="22" rx="5" opacity="0.9"/>
+        <circle cx="30" cy="-32" r="2.5" fill="#00d4ff"/>
+        <rect x="25" y="-24" width="10" height="18" rx="5" opacity="0.85"/>
+        
+        <!-- Thumb -->
+        <g transform="rotate(-25)">
+          <rect x="-45" y="5" width="14" height="22" rx="7" opacity="0.9"/>
+          <circle cx="-38" cy="16" r="3" fill="#00d4ff"/>
+          <rect x="-45" y="22" width="14" height="18" rx="7" opacity="0.85"/>
+        </g>
+      </g>
+    </g>
+    
+    <!-- Advanced Circuit Patterns -->
+    <g stroke="#00d4ff" stroke-width="1.2" fill="none" opacity="0.7">
+      <path d="M-15,-5 L-5,-5 L-5,5 L5,5 L5,15">
+        <animate attributeName="stroke-dasharray" values="0,60; 60,0; 0,60" dur="3s" repeatCount="indefinite"/>
+      </path>
+      <path d="M15,-8 L25,-8 L25,2 L15,2">
+        <animate attributeName="stroke-dasharray" values="0,50; 50,0; 0,50" dur="3.5s" repeatCount="indefinite"/>
+      </path>
+      <!-- Neural nodes -->
+      <circle cx="-10" cy="0" r="2.5" fill="#00d4ff">
+        <animate attributeName="fill" values="#00d4ff;#5b73ff;#00d4ff" dur="2s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="10" cy="8" r="2.5" fill="#5b73ff">
+        <animate attributeName="fill" values="#5b73ff;#00d4ff;#5b73ff" dur="2.2s" repeatCount="indefinite"/>
+      </circle>
+    </g>
+    
+    <!-- Energy Glow Effect -->
+    <ellipse cx="0" cy="10" rx="45" ry="65" fill="url(#glowEffect)" opacity="0.3">
+      <animate attributeName="opacity" values="0.2;0.4;0.2" dur="3s" repeatCount="indefinite"/>
+    </ellipse>
+  </g>
+
+  <!-- Floating Educational Icons -->
+  <g opacity="0.12">
+    <!-- Book Icon -->
+    <g transform="translate(200, 250)">
+      <rect x="0" y="0" width="20" height="15" fill="#00d4ff" rx="2"/>
+      <rect x="2" y="2" width="16" height="11" fill="none" stroke="#5b73ff" stroke-width="0.5"/>
+      <line x1="6" y1="5" x2="16" y2="5" stroke="#5b73ff" stroke-width="0.5"/>
+      <line x1="6" y1="8" x2="14" y2="8" stroke="#5b73ff" stroke-width="0.5"/>
+      <animateTransform attributeName="transform" type="translate" 
+                        values="200,250; 210,240; 200,250" dur="5s" repeatCount="indefinite"/>
+    </g>
+    
+    <!-- Classroom Icon -->
+    <g transform="translate(1100, 300)">
+      <rect x="0" y="0" width="25" height="20" fill="#5b73ff" rx="2"/>
+      <rect x="3" y="3" width="8" height="6" fill="#00d4ff"/>
+      <rect x="14" y="3" width="8" height="6" fill="#00d4ff"/>
+      <rect x="3" y="11" width="8" height="6" fill="#00d4ff"/>
+      <rect x="14" y="11" width="8" height="6" fill="#00d4ff"/>
+      <animateTransform attributeName="transform" type="translate" 
+                        values="1100,300; 1090,290; 1100,300" dur="6s" repeatCount="indefinite"/>
+    </g>
+    
+    <!-- Faculty/Person Icon -->
+    <g transform="translate(300, 600)">
+      <circle cx="8" cy="6" r="4" fill="#8a2be2"/>
+      <path d="M2,18 Q8,12 14,18" fill="#8a2be2"/>
+      <animateTransform attributeName="transform" type="translate" 
+                        values="300,600; 310,590; 300,600" dur="4.5s" repeatCount="indefinite"/>
+    </g>
+  </g>
+
+  <!-- Connection Lines Between Hand and Hologram -->
+  <g opacity="0.08" stroke="#00d4ff" stroke-width="1" fill="none">
+    <path d="M500,320 Q600,280 750,300">
+      <animate attributeName="stroke-dasharray" values="0,200; 200,0; 0,200" dur="4s" repeatCount="indefinite"/>
+    </path>
+    <path d="M520,340 Q650,300 780,320">
+      <animate attributeName="stroke-dasharray" values="200,0; 0,200; 200,0" dur="5s" repeatCount="indefinite"/>
+    </path>
+  </g>
+
+  <!-- Subtle Gradient Overlay for Readability -->
+  <rect x="0" y="0" width="1400" height="900" fill="url(#bgGradient)" opacity="0.5"/>
+</svg>
