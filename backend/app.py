@@ -30,6 +30,13 @@ app = Flask(
 )
 
 app.secret_key = os.getenv('SECRET_KEY', 'your-secret-key-change-this-in-production')
+# ✅ SESSION FIX FOR RENDER + GOOGLE OAUTH
+app.config.update(
+    SESSION_COOKIE_SECURE=True,     # HTTPS only
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE="None", # REQUIRED for OAuth
+)
+
 
 # ✅ REQUIRED FOR RENDER HTTPS
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
