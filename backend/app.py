@@ -32,10 +32,12 @@ app = Flask(
 app.secret_key = os.getenv('SECRET_KEY', 'your-secret-key-change-this-in-production')
 # ✅ SESSION FIX FOR RENDER + GOOGLE OAUTH
 app.config.update(
-    SESSION_COOKIE_SECURE=True,     # HTTPS only
+    SESSION_COOKIE_SECURE=True,
     SESSION_COOKIE_HTTPONLY=True,
-    SESSION_COOKIE_SAMESITE="None", # REQUIRED for OAuth
+    SESSION_COOKIE_SAMESITE="Lax",  # Changed from "None" to "Lax"
+    SESSION_COOKIE_DOMAIN=".onrender.com",  # Added
 )
+
 
 
 # ✅ REQUIRED FOR RENDER HTTPS
@@ -135,11 +137,11 @@ with app.app_context():
 
 
 def login_required(f):
+    @wraps(f)  # 🔥 ADD THIS LINE
     def decorated_function(*args, **kwargs):
         if 'user_id' not in session:
             return redirect(url_for('login'))
         return f(*args, **kwargs)
-    decorated_function.__name__ = f.__name__
     return decorated_function
 
 # 
@@ -552,8 +554,9 @@ def logout():
 
 @app.route('/login/google')
 def login_google():
-    redirect_uri = "https://smart-shedulers.onrender.com/auth/google/callback"
+    redirect_uri = url_for('google_callback', _external=True)  # 🔥 DYNAMIC
     return google.authorize_redirect(redirect_uri)
+
 
 
 @app.route('/auth/google/callback')
@@ -562,14 +565,14 @@ def google_callback():
         token = google.authorize_access_token()
         resp = google.get('userinfo')
         user_info = resp.json()
+        
         email = user_info.get('email')
         name = user_info.get('name', email.split('@')[0] if email else 'User')
-
+        
         if not email:
             flash('Could not get email from Google.', 'error')
             return redirect(url_for('login'))
-
-        # Find or create user
+        
         user = User.query.filter_by(email=email).first()
         if not user:
             user = User(
@@ -581,17 +584,22 @@ def google_callback():
             user.set_password(os.urandom(16).hex())
             db.session.add(user)
             db.session.commit()
-
-        # Log in
+        
+        # 🔥 CRITICAL FIX: Clear old session first
+        session.clear()
+        
         session['user_id'] = user.id
         session['username'] = user.username
         session['role'] = user.role
-
+        session.permanent = True  # Make session persistent
+        
         flash('Logged in with Google!', 'success')
         return redirect(url_for('dashboard'))
+    
     except Exception as e:
         flash(f'Google login failed: {str(e)}', 'error')
         return redirect(url_for('login'))
+
 
 def admin_required(f):
     @wraps(f)
@@ -2212,9 +2220,4 @@ def download_timetable_pdf(timetable_id):
         print(f"Error generating PDF: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
-
-if __name__ == '__main__':
-    init_db()
-    app.run(debug=True)
-
-
+# Run with: gunicorn backend.app:app
