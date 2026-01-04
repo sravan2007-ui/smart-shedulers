@@ -18,9 +18,30 @@ from authlib.integrations.flask_client import OAuth
 import requests
 from itsdangerous import URLSafeTimedSerializer
 from flask_mail import Mail, Message
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 
 load_dotenv()
+app = Flask(
+    __name__,
+    template_folder='../frontend/templates',
+    static_folder='../frontend/static'
+)
+
+app.secret_key = os.getenv('SECRET_KEY', 'your-secret-key-change-this-in-production')
+
+# ✅ REQUIRED FOR RENDER HTTPS
+from werkzeug.middleware.proxy_fix import ProxyFix
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+app.config['PREFERRED_URL_SCHEME'] = 'https'
+
+# ✅ NOW apply DATABASE config
+if os.environ.get('RENDER'):
+    mysql_url = os.environ.get('DATABASE_URL')
+    if mysql_url:
+        if mysql_url.startswith("postgres://"):
+            mysql_url = mysql_url.replace("postgres://", "postgresql://", 1)
+        app.config['SQLALCHEMY_DATABASE_URI'] = mysql_url
 if os.environ.get('RENDER'):
     # Use environment variables for production
     mysql_url = os.environ.get('DATABASE_URL')
@@ -33,6 +54,7 @@ if os.environ.get('RENDER'):
 # ✅ create the Flask app FIRST
 app = Flask(__name__, template_folder='../frontend/templates', static_folder='../frontend/static')
 app.secret_key = os.getenv('SECRET_KEY', 'your-secret-key-change-this-in-production')
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
 # Google OAuth setup
 app.config['GOOGLE_CLIENT_ID'] = os.getenv('GOOGLE_CLIENT_ID')
@@ -511,8 +533,9 @@ def logout():
 
 @app.route('/login/google')
 def login_google():
-    redirect_uri = url_for('google_callback', _external=True)
+    redirect_uri = "https://smart-shedulers.onrender.com/auth/google/callback"
     return google.authorize_redirect(redirect_uri)
+
 
 @app.route('/auth/google/callback')
 def google_callback():
@@ -2173,6 +2196,6 @@ def download_timetable_pdf(timetable_id):
 
 if __name__ == '__main__':
     init_db()
-    app.run(debug=True, port=5001)
+    app.run(debug=True)
 
 
