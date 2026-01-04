@@ -31,6 +31,20 @@ app = Flask(
 
 app.secret_key = os.getenv('SECRET_KEY', 'your-secret-key-change-this-in-production')
 # ✅ SESSION FIX FOR RENDER + GOOGLE OAUTH
+
+app = Flask(
+    __name__,
+    template_folder='../frontend/templates',
+    static_folder='../frontend/static'
+)
+
+app.secret_key = os.getenv('SECRET_KEY', 'your-secret-key-change-this-in-production')
+
+# 🔥 ADD THESE SESSION CONFIGS:
+from datetime import timedelta
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
+app.config['SESSION_REFRESH_EACH_REQUEST'] = True
+
 app.config.update(
     SESSION_COOKIE_SECURE=True,
     SESSION_COOKIE_HTTPONLY=True,
@@ -189,18 +203,15 @@ def login():
         ).first()
         
         if user and user.check_password(password):
-            # Check if email is verified
             if not getattr(user, 'is_verified', False):
-                message = 'Please verify your email before logging in.'
-                if is_ajax:
-                    return jsonify({'success': False, 'message': message}), 403
-                flash(message)
-                return redirect(url_for('login'))
-
-            # Set session
-            session['user_id'] = user.id
-            session['username'] = user.username
-            session['role'] = user.role
+        # ... verification check ...
+    
+    # Set session
+                session.clear()  # Clear any old session
+                session['user_id'] = user.id
+                session['username'] = user.username
+                session['role'] = user.role
+                session.permanent = True  # 🔥 ADD THIS LINE
 
             if is_ajax:
                 return jsonify({
