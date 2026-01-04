@@ -38,24 +38,36 @@ app.config['PREFERRED_URL_SCHEME'] = 'https'
 # ✅ DATABASE CONFIGURATION (ONLY ONCE, CHECK RENDER FIRST)
 if os.environ.get('RENDER'):
     # Use PostgreSQL on Render
-    database_url = os.environ.get('DATABASE_URL')
-    if database_url:
-        # Convert postgres:// to postgresql:// if needed
-        if database_url.startswith("postgres://"):
-            database_url = database_url.replace("postgres://", "postgresql://", 1)
-        app.config['SQLALCHEMY_DATABASE_URI'] = database_url
-        print(f"✅ Using Render PostgreSQL: {database_url[:30]}...")
+    # ✅ DATABASE CONFIGURATION (FINAL & SAFE)
+
+   # ✅ DATABASE CONFIGURATION (FIXED - CHECK DATABASE_URL FIRST)
+    database_url = os.getenv("DATABASE_URL")  # ✅ Move this OUTSIDE the if block
+
+if database_url:
+    # Running on Render with PostgreSQL
+    if database_url.startswith("postgres://"):
+        database_url = database_url.replace("postgres://", "postgresql://", 1)
+    
+    app.config["SQLALCHEMY_DATABASE_URI"] = database_url
+    print("✅ Using PostgreSQL (Render)")
+
 else:
-    # Use MySQL locally
+    # Running locally with MySQL
     mysql_user = os.getenv('MYSQL_USER', 'root')
     mysql_password = os.getenv('MYSQL_PASSWORD', 'sravan167')
     mysql_host = os.getenv('MYSQL_HOST', 'localhost')
     mysql_port = os.getenv('MYSQL_PORT', '3306')
     mysql_database = os.getenv('MYSQL_DATABASE', 'smart_classroom_scheduler')
-    app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://{mysql_user}:{mysql_password}@{mysql_host}:{mysql_port}/{mysql_database}"
-    print(f"✅ Using Local MySQL: {mysql_database}")
+    
+    app.config["SQLALCHEMY_DATABASE_URI"] = (
+        f"mysql+pymysql://{mysql_user}:{mysql_password}@"
+        f"{mysql_host}:{mysql_port}/{mysql_database}"
+    )
+    print("✅ Using Local MySQL")
 
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+
 
 # Google OAuth setup
 app.config['GOOGLE_CLIENT_ID'] = os.getenv('GOOGLE_CLIENT_ID')
