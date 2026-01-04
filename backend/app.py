@@ -60,6 +60,17 @@ if database_url:
     app.config["SQLALCHEMY_DATABASE_URI"] = database_url
     print("✅ Using PostgreSQL (Render)")
 
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    'pool_pre_ping': True,
+    'pool_recycle': 300,
+    'pool_size': 3,
+    'max_overflow': 0,
+    'connect_args': {
+        'sslmode': 'require'
+    }
+}
+
+
 else:
     # Running locally with MySQL
     mysql_user = os.getenv('MYSQL_USER', 'root')
