@@ -1,9 +1,9 @@
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for, flash, make_response
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
-from models import db, User, Subject, Faculty, Classroom, Batch, Timetable, TimetableEntry, FacultySubject, ClassroomAllocation
-from timetable_optimizer import TimetableOptimizer
-from classroom_allocator import SmartClassroomAllocator, extract_branch_section_from_name, generate_batch_name
+from backend.models import db, User, Subject, Faculty, Classroom, Batch, Timetable, TimetableEntry, FacultySubject, ClassroomAllocation
+from backend.timetable_optimizer import TimetableOptimizer
+from backend.classroom_allocator import SmartClassroomAllocator, extract_branch_section_from_name, generate_batch_name
 import json
 from functools import wraps
 from reportlab.lib import colors
