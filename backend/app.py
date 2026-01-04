@@ -34,9 +34,10 @@ app.secret_key = os.getenv('SECRET_KEY', 'your-secret-key-change-this-in-product
 app.config.update(
     SESSION_COOKIE_SECURE=True,
     SESSION_COOKIE_HTTPONLY=True,
-    SESSION_COOKIE_SAMESITE="Lax",  # Changed from "None" to "Lax"
-    SESSION_COOKIE_DOMAIN=".onrender.com",  # Added
+    SESSION_COOKIE_SAMESITE="Lax"
+    # Let Flask use the default domain (current URL)
 )
+
 
 
 
