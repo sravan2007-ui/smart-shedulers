@@ -108,11 +108,13 @@ serializer = URLSafeTimedSerializer(app.secret_key)
 
 db.init_app(app)
 
-def init_db():
-    """Initialize the database with required tables"""
-    with app.app_context():
+# ✅ Initialize database tables on startup (runs on Render)
+with app.app_context():
+    try:
         db.create_all()
+        print("✅ Database tables created")
         
+        # Create admin user if doesn't exist
         admin_user = User.query.filter_by(username='admin').first()
         if not admin_user:
             admin_user = User(
@@ -124,6 +126,9 @@ def init_db():
             admin_user.set_password('admin123')
             db.session.add(admin_user)
             db.session.commit()
+            print("✅ Admin user created")
+    except Exception as e:
+        print(f"❌ Database initialization error: {e}")
 
 # ... rest of your routes stay the same ...
 
