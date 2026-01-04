@@ -48,12 +48,8 @@ app.config['SESSION_REFRESH_EACH_REQUEST'] = True
 app.config.update(
     SESSION_COOKIE_SECURE=True,
     SESSION_COOKIE_HTTPONLY=True,
-    SESSION_COOKIE_SAMESITE="Lax"
-    # Let Flask use the default domain (current URL)
+    SESSION_COOKIE_SAMESITE="None"  # 🔥 Change back to "None" for OAuth
 )
-
-
-
 
 # ✅ REQUIRED FOR RENDER HTTPS
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
