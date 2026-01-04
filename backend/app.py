@@ -20,8 +20,9 @@ from itsdangerous import URLSafeTimedSerializer
 from flask_mail import Mail, Message
 from werkzeug.middleware.proxy_fix import ProxyFix
 
-
 load_dotenv()
+
+# ✅ CREATE FLASK APP ONLY ONCE
 app = Flask(
     __name__,
     template_folder='../frontend/templates',
@@ -31,30 +32,30 @@ app = Flask(
 app.secret_key = os.getenv('SECRET_KEY', 'your-secret-key-change-this-in-production')
 
 # ✅ REQUIRED FOR RENDER HTTPS
-from werkzeug.middleware.proxy_fix import ProxyFix
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 app.config['PREFERRED_URL_SCHEME'] = 'https'
 
-# ✅ NOW apply DATABASE config
+# ✅ DATABASE CONFIGURATION (ONLY ONCE, CHECK RENDER FIRST)
 if os.environ.get('RENDER'):
-    mysql_url = os.environ.get('DATABASE_URL')
-    if mysql_url:
-        if mysql_url.startswith("postgres://"):
-            mysql_url = mysql_url.replace("postgres://", "postgresql://", 1)
-        app.config['SQLALCHEMY_DATABASE_URI'] = mysql_url
-if os.environ.get('RENDER'):
-    # Use environment variables for production
-    mysql_url = os.environ.get('DATABASE_URL')
-    if mysql_url:
+    # Use PostgreSQL on Render
+    database_url = os.environ.get('DATABASE_URL')
+    if database_url:
         # Convert postgres:// to postgresql:// if needed
-        if mysql_url.startswith("postgres://"):
-            mysql_url = mysql_url.replace("postgres://", "postgresql://", 1)
-        app.config['SQLALCHEMY_DATABASE_URI'] = mysql_url
-        
-# ✅ create the Flask app FIRST
-app = Flask(__name__, template_folder='../frontend/templates', static_folder='../frontend/static')
-app.secret_key = os.getenv('SECRET_KEY', 'your-secret-key-change-this-in-production')
-app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+        if database_url.startswith("postgres://"):
+            database_url = database_url.replace("postgres://", "postgresql://", 1)
+        app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+        print(f"✅ Using Render PostgreSQL: {database_url[:30]}...")
+else:
+    # Use MySQL locally
+    mysql_user = os.getenv('MYSQL_USER', 'root')
+    mysql_password = os.getenv('MYSQL_PASSWORD', 'sravan167')
+    mysql_host = os.getenv('MYSQL_HOST', 'localhost')
+    mysql_port = os.getenv('MYSQL_PORT', '3306')
+    mysql_database = os.getenv('MYSQL_DATABASE', 'smart_classroom_scheduler')
+    app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://{mysql_user}:{mysql_password}@{mysql_host}:{mysql_port}/{mysql_database}"
+    print(f"✅ Using Local MySQL: {mysql_database}")
+
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Google OAuth setup
 app.config['GOOGLE_CLIENT_ID'] = os.getenv('GOOGLE_CLIENT_ID')
@@ -83,17 +84,8 @@ app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
 app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
 app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_USERNAME')
 
-
 mail = Mail(app)
 serializer = URLSafeTimedSerializer(app.secret_key)
-mysql_user = os.getenv('MYSQL_USER', 'root')
-mysql_password = os.getenv('MYSQL_PASSWORD', 'sravan167')
-mysql_host = os.getenv('MYSQL_HOST', 'localhost')
-mysql_port = os.getenv('MYSQL_PORT', '3306')
-mysql_database = os.getenv('MYSQL_DATABASE', 'smart_classroom_scheduler')
-
-app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://{mysql_user}:{mysql_password}@{mysql_host}:{mysql_port}/{mysql_database}"
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
 
@@ -113,6 +105,9 @@ def init_db():
             admin_user.set_password('admin123')
             db.session.add(admin_user)
             db.session.commit()
+
+# ... rest of your routes stay the same ...
+
 
 
 def login_required(f):
