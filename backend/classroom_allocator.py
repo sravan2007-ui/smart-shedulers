@@ -3,7 +3,7 @@ Smart Classroom Allocation System
 Handles dynamic classroom sharing between branches and sections
 """
 
-from models import db, Classroom, Batch, Subject, TimetableEntry, ClassroomAllocation
+from backend.models import db, Classroom, Batch, Subject, TimetableEntry, ClassroomAllocation
 from sqlalchemy import and_, or_
 from datetime import datetime
 import logging
