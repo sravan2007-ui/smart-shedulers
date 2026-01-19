@@ -16,7 +16,7 @@
 </head>
 
 <body>
-    {% if session.user_id %}
+    {% if session.user_id and not show_login_page %}
     <!-- Modern Sidebar Navigation -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">

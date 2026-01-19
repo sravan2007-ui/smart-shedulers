@@ -1,5 +1,5 @@
-from backend.models import db, Subject, Faculty, Classroom, Batch, FacultySubject
-from backend.classroom_allocator import SmartClassroomAllocator
+from models import db, Subject, Faculty, Classroom, Batch, FacultySubject
+from classroom_allocator import SmartClassroomAllocator
 import random
 from datetime import datetime, timedelta
 from collections import defaultdict

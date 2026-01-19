@@ -1074,6 +1074,21 @@ html {
         }
 
         window.showToast = showToast;
+
+        // ✅ CHECK FOR GOOGLE LOGIN SUCCESS
+        const urlParams = new URLSearchParams(window.location.search);
+        const googleSuccess = urlParams.get('google_success');
+        const username = urlParams.get('username');
+        
+        if (googleSuccess === 'true' && username) {
+            // Show success animation immediately
+            showLoginSuccessAnimation(username);
+            
+            // Redirect to dashboard after animation
+            setTimeout(() => {
+                window.location.href = '/dashboard';
+            }, 2500);
+        }
     });
 
     document.addEventListener('click', function(e) {

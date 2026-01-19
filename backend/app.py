@@ -1,9 +1,14 @@
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for, flash, make_response
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
-from backend.models import db, User, Subject, Faculty, Classroom, Batch, Timetable, TimetableEntry, FacultySubject, ClassroomAllocation
-from backend.timetable_optimizer import TimetableOptimizer
-from backend.classroom_allocator import SmartClassroomAllocator, extract_branch_section_from_name, generate_batch_name
+import sys
+import os
+# Add current directory to path so imports work on Vercel
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+from models import db, User, Subject, Faculty, Classroom, Batch, Timetable, TimetableEntry, FacultySubject, ClassroomAllocation
+from timetable_optimizer import TimetableOptimizer
+from classroom_allocator import SmartClassroomAllocator, extract_branch_section_from_name, generate_batch_name
 import json
 from functools import wraps
 from reportlab.lib import colors
@@ -45,11 +50,14 @@ from datetime import timedelta
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
 app.config['SESSION_REFRESH_EACH_REQUEST'] = True
 
+# Dynamic session config - False for localhost, True for production
+is_production = bool(os.environ.get('RENDER') or os.environ.get('DATABASE_URL'))
+
 app.config.update(
-    SESSION_COOKIE_SECURE=True,
+    SESSION_COOKIE_SECURE=is_production,  # False on localhost, True on Render
     SESSION_COOKIE_HTTPONLY=True,
-    SESSION_COOKIE_SAMESITE="None",  # 🔥 Change back to "None" for OAuth
-    SESSION_COOKIE_DOMAIN=None  # 🔥 ADD THIS LINE - Use exact domain, not .onrender.com
+    SESSION_COOKIE_SAMESITE="Lax",
+    SESSION_COOKIE_DOMAIN=None
 )
 
 # ✅ REQUIRED FOR RENDER HTTPS
@@ -57,20 +65,20 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 app.config['PREFERRED_URL_SCHEME'] = 'https'
 
 # ✅ DATABASE CONFIGURATION (ONLY ONCE, CHECK RENDER FIRST)
-if os.environ.get('RENDER'):
+# ✅ DATABASE CONFIGURATION (FIXED - CHECK DATABASE_URL FIRST)
+database_url = os.getenv("DATABASE_URL")  # ✅ Move this OUTSIDE the if block
+
+if os.environ.get('RENDER') or database_url:
     # Use PostgreSQL on Render
     # ✅ DATABASE CONFIGURATION (FINAL & SAFE)
 
-   # ✅ DATABASE CONFIGURATION (FIXED - CHECK DATABASE_URL FIRST)
-    database_url = os.getenv("DATABASE_URL")  # ✅ Move this OUTSIDE the if block
-
-if database_url:
-    # Running on Render with PostgreSQL
-    if database_url.startswith("postgres://"):
-        database_url = database_url.replace("postgres://", "postgresql://", 1)
-    
-    app.config["SQLALCHEMY_DATABASE_URI"] = database_url
-    print("✅ Using PostgreSQL (Render)")
+    if database_url:
+        # Running on Render with PostgreSQL
+        if database_url.startswith("postgres://"):
+            database_url = database_url.replace("postgres://", "postgresql://", 1)
+        
+        app.config["SQLALCHEMY_DATABASE_URI"] = database_url
+        print("✅ Using PostgreSQL (Render)")
 
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
     'pool_pre_ping': True,
@@ -177,6 +185,12 @@ def index():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    # ✅ Allow Google success animation to show even if user is logged in
+    google_success = request.args.get('google_success')
+    if 'user_id' in session and request.method == 'GET' and google_success != 'true':
+        # User is already logged in and no special animation to show
+        return redirect(url_for('dashboard'))
+    
     if request.method == 'POST':
         # Clear any previous flash messages to prevent stacking
         session.pop('_flashes', None)
@@ -230,7 +244,8 @@ def login():
                 flash(message)
     
     # Prevent caching
-    response = make_response(render_template('login.html'))
+    show_animation = request.args.get('google_success') == 'true'
+    response = make_response(render_template('login.html', show_login_page=show_animation))
     response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
     response.headers['Pragma'] = 'no-cache'
     response.headers['Expires'] = '0'   
@@ -382,33 +397,63 @@ def register():
         
         # Check if user already exists
         existing_user = User.query.filter_by(username=username).first()
+        existing_email_user = User.query.filter_by(email=email).first()
+        
+        user_to_update = None
+
+        # Check for verified email collision
+        if existing_email_user:
+            if existing_email_user.is_verified:
+                if is_ajax:
+                    return jsonify({
+                        'success': False,
+                        'message': 'Email already registered. Please use a different email.'
+                    }), 400
+                else:
+                    flash('Email already registered. Please use a different email.', 'error')
+                    return render_template('register.html')
+            else:
+                # Found unverified user with this email - determine if we should update
+                user_to_update = existing_email_user
+
+        # Check for verified username collision
         if existing_user:
-            if is_ajax:
-                return jsonify({
-                    'success': False,
-                    'message': 'Username already exists. Please choose a different username.'
-                }), 400
-            else:
-                flash('Username already exists. Please choose a different username.', 'error')
-                return render_template('register.html')
-        
-        # Check if email already exists
-        existing_email = User.query.filter_by(email=email).first()
-        if existing_email:
-            if is_ajax:
-                return jsonify({
-                    'success': False,
-                    'message': 'Email already registered. Please use a different email.'
-                }), 400
-            else:
-                flash('Email already registered. Please use a different email.', 'error')
-                return render_template('register.html')
-        
-        # Create new user
+            if existing_user.is_verified:
+                if is_ajax:
+                    return jsonify({
+                        'success': False,
+                        'message': 'Username already exists. Please choose a different username.'
+                    }), 400
+                else:
+                    flash('Username already exists. Please choose a different username.', 'error')
+                    return render_template('register.html')
+            
+            # Application of collision logic:
+            # If we have a user_to_update (from email), and it is DIFFERENT from this username-user
+            # It means the username is taken by a stale unverified account.
+            # We should remove the stale account to release the username.
+            if user_to_update and user_to_update.id != existing_user.id:
+                db.session.delete(existing_user)
+                # We continue to use user_to_update
+            
+            # If we don't have a user_to_update yet (email is new), but username exists (unverified)
+            # We can reuse this username-user account
+            elif not user_to_update:
+                user_to_update = existing_user
+
+        # Create or Update user
         try:
-            new_user = User(username=username, email=email, role=role, is_verified=False)
+            if user_to_update:
+                new_user = user_to_update
+                new_user.username = username
+                new_user.email = email
+                new_user.role = role
+                new_user.is_verified = False  # Reset/Ensure false
+            else:
+                new_user = User(username=username, email=email, role=role, is_verified=False)
+                db.session.add(new_user)
+
             new_user.set_password(password)
-            db.session.add(new_user)
             db.session.commit()
 
             # Generate and send verification email
@@ -613,8 +658,8 @@ def google_callback():
         session['role'] = user.role
         session.permanent = True  # Make session persistent
         
-        flash('Logged in with Google!', 'success')
-        return redirect(url_for('dashboard'))
+        # ✅ Redirect to login with success flag to show animation
+        return redirect(url_for('login', google_success='true', username=user.username))
     
     except Exception as e:
         flash(f'Google login failed: {str(e)}', 'error')
@@ -2241,3 +2286,5 @@ def download_timetable_pdf(timetable_id):
         return jsonify({'success': False, 'error': str(e)}), 500
 
 # Run with: gunicorn backend.app:app
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0', port=8000)
