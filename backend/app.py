@@ -519,11 +519,15 @@ Smart Classroom Scheduler Team
                 
         except Exception as e:
             db.session.rollback()
-            print(f"Registration error: {str(e)}")
+        except Exception as e:
+            db.session.rollback()
+            import traceback
+            error_details = traceback.format_exc()
+            print(f"Registration error: {str(e)}\n{error_details}")
             if is_ajax:
                 return jsonify({
                     'success': False,
-                    'message': 'Registration failed. Please try again.'
+                    'message': f'Registration failed: {str(e)}'
                 }), 500
             else:
                 flash('Registration failed. Please try again.', 'error')
@@ -696,12 +700,15 @@ def admin_dashboard():
 def dashboard():
     try:
         # Get statistics
+        user_id = session.get('user_id')
+        
+        # Get statistics for CURRENT USER ONLY
         stats = {
-            'classrooms_count': Classroom.query.count(),
-            'subjects_count': Subject.query.count(),
-            'faculty_count': Faculty.query.count(),
-            'batches_count': Batch.query.count(),
-            'timetables_count': Timetable.query.count()
+            'classrooms_count': Classroom.query.filter_by(created_by=user_id).count(),
+            'subjects_count': Subject.query.filter_by(created_by=user_id).count(),
+            'faculty_count': Faculty.query.filter_by(created_by=user_id).count(),
+            'batches_count': Batch.query.filter_by(created_by=user_id).count(),
+            'timetables_count': Timetable.query.filter_by(created_by=user_id).count()
         }
         
         # Get recent timetables with proper error handling
@@ -711,7 +718,7 @@ def dashboard():
                 Batch, Timetable.batch_id == Batch.id, isouter=True
             ).join(
                 User, Timetable.created_by == User.id, isouter=True
-            ).order_by(Timetable.created_at.desc()).limit(5).all()
+            ).filter(Timetable.created_by == user_id).order_by(Timetable.created_at.desc()).limit(5).all()
             
             # Format the data for template
             for timetable in recent_timetables_query:
@@ -784,7 +791,8 @@ def api_classrooms():
                 is_fixed_allocation=data.get('is_fixed_allocation', False),
                 fixed_batch_id=data.get('fixed_batch_id', None),
                 priority_level=data.get('priority_level', 1),
-                can_be_shared=data.get('can_be_shared', True)
+                can_be_shared=data.get('can_be_shared', True),
+                created_by=session['user_id']
             )
             db.session.add(classroom)
             db.session.commit()
@@ -794,7 +802,9 @@ def api_classrooms():
             db.session.rollback()
             return jsonify({'success': False, 'error': str(e)}), 500
     
-    classrooms = Classroom.query.order_by(Classroom.name).all()
+            return jsonify({'success': False, 'error': str(e)}), 500
+    
+    classrooms = Classroom.query.filter_by(created_by=session['user_id']).order_by(Classroom.name).all()
     return jsonify({
         'success': True,
         'classrooms': [{
@@ -1140,17 +1150,19 @@ def api_subjects():
                 hours_per_week=data.get('hours_per_week', 3),
                 requires_lab=data.get('requires_lab', False),
                 scheduling_preference=data.get('scheduling_preference', 'single'),
-                continuous_block_size=data.get('continuous_block_size', 2)
+                continuous_block_size=data.get('continuous_block_size', 2),
+                created_by=session['user_id']
             )
             db.session.add(subject)
             db.session.commit()
+            
             
             return jsonify({'success': True, 'message': 'Subject added successfully'})
         except Exception as e:
             db.session.rollback()
             return jsonify({'success': False, 'error': str(e)}), 500
     
-    subjects = Subject.query.order_by(Subject.department, Subject.semester, Subject.name).all()
+    subjects = Subject.query.filter_by(created_by=session['user_id']).order_by(Subject.department, Subject.semester, Subject.name).all()
     return jsonify({
         'success': True,
         'subjects': [{
@@ -1218,17 +1230,19 @@ def api_faculty():
                 email=data.get('email', ''),
                 max_hours_per_day=data.get('max_hours_per_day', 6),
                 max_hours_per_week=data.get('max_hours_per_week', 20),
-                avg_leaves_per_month=data.get('avg_leaves_per_month', 2)
+                avg_leaves_per_month=data.get('avg_leaves_per_month', 2),
+                created_by=session['user_id']
             )
             db.session.add(faculty)
             db.session.commit()
+            
             
             return jsonify({'success': True, 'message': 'Faculty added successfully'})
         except Exception as e:
             db.session.rollback()
             return jsonify({'success': False, 'error': str(e)}), 500
     
-    faculty = Faculty.query.order_by(Faculty.department, Faculty.name).all()
+    faculty = Faculty.query.filter_by(created_by=session['user_id']).order_by(Faculty.department, Faculty.name).all()
     return jsonify({
         'success': True,
         'faculty': [{
@@ -1303,8 +1317,9 @@ def api_batches():
                 section=section,
                 semester=data['semester'],
                 student_count=data['student_count'],
-                priority_for_allocation=data.get('priority_for_allocation', 2)
+                priority_for_allocation=data.get('priority_for_allocation', 2),
                 # shift will be automatically assigned during timetable generation
+                created_by=session['user_id']
             )
             db.session.add(batch)
             db.session.commit()
@@ -1314,7 +1329,7 @@ def api_batches():
             db.session.rollback()
             return jsonify({'success': False, 'error': str(e)}), 500
     
-    batches = Batch.query.order_by(Batch.department, Batch.semester, Batch.name).all()
+    batches = Batch.query.filter_by(created_by=session['user_id']).order_by(Batch.department, Batch.semester, Batch.name).all()
     return jsonify({
         'success': True,
         'batches': [{

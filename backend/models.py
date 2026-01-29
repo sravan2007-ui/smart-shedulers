@@ -36,9 +36,11 @@ class Classroom(db.Model):
     fixed_batch_id = db.Column(db.Integer, db.ForeignKey('batches.id'), nullable=True)
     priority_level = db.Column(db.Integer, default=1)
     can_be_shared = db.Column(db.Boolean, default=True)
+    created_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True) # Set to True initially for migration
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     fixed_batch = db.relationship('Batch', backref='fixed_classrooms', foreign_keys=[fixed_batch_id])
+    creator = db.relationship('User', backref='classrooms')
 
 
 class Subject(db.Model):
@@ -54,7 +56,11 @@ class Subject(db.Model):
     requires_lab = db.Column(db.Boolean, default=False)
     scheduling_preference = db.Column(db.String(20), default='single')
     continuous_block_size = db.Column(db.Integer, default=2)
+    created_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Add relationship
+    creator = db.relationship('User', backref='subjects')
 
 
 class Faculty(db.Model):
@@ -68,7 +74,10 @@ class Faculty(db.Model):
     max_hours_per_day = db.Column(db.Integer, default=6)
     max_hours_per_week = db.Column(db.Integer, default=20)
     avg_leaves_per_month = db.Column(db.Integer, default=2)
+    created_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    creator = db.relationship('User', backref='faculty')
 
 
 class Batch(db.Model):
@@ -84,7 +93,10 @@ class Batch(db.Model):
     student_count = db.Column(db.Integer, default=60)
     shift = db.Column(db.String(20), default='morning')
     priority_for_allocation = db.Column(db.Integer, default=2)
+    created_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    creator = db.relationship('User', backref='batches')
 
 
 class FacultySubject(db.Model):
